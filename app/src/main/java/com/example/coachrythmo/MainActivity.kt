@@ -11,7 +11,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.coachrythmo.presentation.list.ListRoutinesScreen
+import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
+import com.example.userstoriesapp.navigation.Screen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +26,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CoachRythmoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
+                    val navController = rememberNavController()
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.RoutinesListScreen.route,
                         modifier = Modifier.padding(innerPadding)
-                    )
+                    ) {
+                        composable(route = Screen.RoutinesListScreen.route) {
+                            val stories = viewModel<ListRoutinesViewsModel>()
+                            ListRoutinesScreen(navController, stories)
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CoachRythmoTheme {
-        Greeting("Android")
     }
 }
