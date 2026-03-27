@@ -1,4 +1,4 @@
-package com.example.coachrythmo.navigation;
+package com.example.coachrythmo.navigation
 
 sealed class Screen(val route: String) {
     data object HomeScreen : Screen(route = "home")
