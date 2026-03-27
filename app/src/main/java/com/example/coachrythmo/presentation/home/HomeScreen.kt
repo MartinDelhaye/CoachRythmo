@@ -5,27 +5,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.coachrythmo.presentation.components.AppScreen
 
 @Composable
-fun HomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+fun HomeScreen(
+    navController: NavController
+) {
+    AppScreen(
+        navController = navController,
+        title="Accueil"
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Text(
+                text = "H2",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Intégration à faire",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
 
-        Text(
-            text = "Accueil - H1",
-            style = MaterialTheme.typography.titleLarge
-        )
-        Text(
-            text = "H2",
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = "Intégration à faire",
-            style = MaterialTheme.typography.bodyMedium
-        )
     }
 }

@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen()
+                            HomeScreen(navController)
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
