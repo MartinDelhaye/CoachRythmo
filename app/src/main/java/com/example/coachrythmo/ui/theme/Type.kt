@@ -8,40 +8,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.coachrythmo.R
 
+val Orbitron = FontFamily(
+    Font(R.font.orbitron_variable_font_wght, FontWeight.Bold)
+)
+
 val Roboto = FontFamily(
     Font(R.font.roboto_regular, FontWeight.Normal),
-    Font(R.font.roboto_semi_bold, FontWeight.Medium),
     Font(R.font.roboto_bold, FontWeight.Bold)
 )
 
 // Typography Material3
 val Typography = Typography(
-    bodyLarge = TextStyle(
+    titleLarge = TextStyle(
+        fontFamily = Orbitron,
+        fontSize = 32.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Orbitron,
+        fontSize = 20.sp
+    ),
+    bodyMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 18.sp
     ),
-    titleLarge = TextStyle(
-        fontFamily = Roboto,
-        fontWeight = FontWeight.Medium,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = Roboto,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = Roboto,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
 )
