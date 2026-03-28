@@ -1,9 +1,11 @@
 package com.example.coachrythmo.presentation.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,15 +20,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coachrythmo.navigation.Screen
+import com.example.coachrythmo.presentation.EasyDifficulty
+import com.example.coachrythmo.presentation.HighDifficulty
+import com.example.coachrythmo.presentation.StandardDifficulty
 import com.example.coachrythmo.presentation.components.RoutineCard
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.CircleShape
 
 @Composable
 fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesViewsModel) {
     val filters = listOf("Toutes", "Durée", "Catégorie", "Difficulté")
     var selectedFilter by remember { mutableStateOf("Toutes") }
+
+    val filteredRoutines = remember(selectedFilter, viewModel.routines.value) {
+        when (selectedFilter) {
+            "Durée" -> viewModel.routines.value.sortedBy { it.durationMinutes ?: Int.MAX_VALUE }
+            "Catégorie" -> viewModel.routines.value.sortedBy { it.category }
+            "Difficulté" -> viewModel.routines.value.sortedBy {
+                when (it.difficulty) {
+                    is EasyDifficulty -> 1
+                    is StandardDifficulty -> 2
+                    is HighDifficulty -> 3
+                    else -> 4
+                }
+            }
+            else -> viewModel.routines.value
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -100,9 +119,9 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Liste
+        // Liste filtrée
         LazyColumn {
-            items(viewModel.routines.value) { routine ->
+            items(filteredRoutines) { routine ->
                 RoutineCard(routine = routine)
             }
         }
