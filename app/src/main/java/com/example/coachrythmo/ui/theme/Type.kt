@@ -32,4 +32,8 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp
     ),
+    headlineMedium = TextStyle(
+        fontFamily = Orbitron,
+        fontSize = 19.sp
+    )
 )
