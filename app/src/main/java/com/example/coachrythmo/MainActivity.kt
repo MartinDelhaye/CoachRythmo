@@ -14,12 +14,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.coachrythmo.navigation.Screen
+import com.example.coachrythmo.presentation.components.CustomMenu
+import com.example.coachrythmo.presentation.home.HomeScreen
+import com.example.coachrythmo.presentation.list.AddRoutineScreen
+import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
-import com.example.coachrythmo.navigation.Screen
-import com.example.coachrythmo.presentation.home.HomeScreen
-import com.example.coachrythmo.presentation.components.CustomMenu
-import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CoachRythmoTheme {
                 val navController = rememberNavController()
+                val sharedViewModel = viewModel<ListRoutinesViewsModel>()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -44,17 +46,19 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
-                            val routines = viewModel<ListRoutinesViewsModel>()
-                            ListRoutinesScreen(navController, routines)
+                            ListRoutinesScreen(navController, sharedViewModel)
+                        }
+
+                        // Ta route ajoutée
+                        composable(Screen.AddRoutineScreen.route) {
+                            AddRoutineScreen(navController, sharedViewModel)
                         }
 
                         composable(Screen.SuiviScreen.route) {
-                            // Add le Screen de la page Suivi ici
                             Text("Page Suivi", style = MaterialTheme.typography.titleLarge)
                         }
 
                         composable(Screen.CompteScreen.route) {
-                            // Add le Screen de la page Suivi ici
                             Text("Page Compte", style = MaterialTheme.typography.titleLarge)
                         }
                     }

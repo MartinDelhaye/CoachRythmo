@@ -9,12 +9,14 @@ import kotlin.random.Random
 data class RoutineVM(
     val id: Int = Random.nextInt(),
     val name: String,
-    val description: String,
+    val description: String = "",
     val category: String,
     val day: String,
     val startTime: String,
-    val difficulty: DifficultyType
+    val difficulty: DifficultyType,
+    val durationMinutes: Int? = null
 )
+
 
 sealed class DifficultyType(
     val color: Color,
@@ -45,7 +47,8 @@ private val routinesList = mutableListOf(
         category = "Pectoraux / Triceps",
         day = "Lundi",
         startTime = "20:00",
-        difficulty = EasyDifficulty
+        difficulty = EasyDifficulty,
+        durationMinutes = 45
     ),
     RoutineVM(
         id = 2,
@@ -54,7 +57,8 @@ private val routinesList = mutableListOf(
         category = "Dos / Biceps",
         day = "Mercredi",
         startTime = "18:30",
-        difficulty = StandardDifficulty
+        difficulty = StandardDifficulty,
+        durationMinutes = 30
     ),
     RoutineVM(
         id = 3,
@@ -63,7 +67,8 @@ private val routinesList = mutableListOf(
         category = "Jambes",
         day = "Vendredi",
         startTime = "19:00",
-        difficulty = HighDifficulty
+        difficulty = HighDifficulty,
+        durationMinutes = 60
     ),
     RoutineVM(
         id = 4,
@@ -72,11 +77,16 @@ private val routinesList = mutableListOf(
         category = "Endurance",
         day = "Dimanche",
         startTime = "10:00",
-        difficulty = StandardDifficulty
+        difficulty = StandardDifficulty,
+        durationMinutes = 30
     )
 )
 
 fun getRoutines() : List<RoutineVM>
 {
     return routinesList
+}
+
+fun addRoutine(routine: RoutineVM) {
+    routinesList.add(routine)
 }
