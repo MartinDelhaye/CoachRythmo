@@ -76,6 +76,7 @@ fun CustomMenu(navController: NavController) {
                             Screen.RoutinesListScreen -> painterResource(id = R.drawable.icon_routine)
                             Screen.SuiviScreen -> painterResource(id = R.drawable.icon_suivi)
                             Screen.CompteScreen -> painterResource(id = R.drawable.icon_compte)
+                            else -> painterResource(id = R.drawable.ic_home)
                                                },
                         contentDescription = screen.route,
                         modifier = Modifier.size(25.dp),
