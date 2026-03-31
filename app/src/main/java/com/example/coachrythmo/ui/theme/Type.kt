@@ -21,19 +21,19 @@ val Roboto = FontFamily(
 val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = Orbitron,
-        fontSize = 32.sp
+        fontSize = 30.sp
     ),
     titleMedium = TextStyle(
         fontFamily = Orbitron,
-        fontSize = 20.sp
+        fontSize = 18.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 18.sp
+        fontSize = 16.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = Orbitron,
-        fontSize = 19.sp
+        fontSize = 17.sp
     )
 )
