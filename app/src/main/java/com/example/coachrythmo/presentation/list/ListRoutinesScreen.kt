@@ -60,7 +60,7 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Routine", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Routine", style = MaterialTheme.typography.titleLarge)
             Box(
                 modifier = Modifier
                     .size(40.dp)
