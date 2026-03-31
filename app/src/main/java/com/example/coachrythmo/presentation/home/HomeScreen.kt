@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.coachrythmo.presentation.components.AppScreen
+import com.example.coachrythmo.presentation.components.TodaySession
 import com.example.coachrythmo.presentation.components.WeekCalendar
 import com.example.coachrythmo.presentation.getRoutines
 
@@ -24,6 +25,7 @@ fun HomeScreen(navController: NavController) {
         ) {
 
             WeekCalendar()
+            TodaySession(todayRoutine)
         }
     }
 }
