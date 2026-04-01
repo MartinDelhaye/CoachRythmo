@@ -44,8 +44,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             LaunchedEffect(Unit) {
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                    if (db.routineDao().count() == 0) {
+
+                    val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                    val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
+
+                    if (isFirstLaunch) {
+                        db.clearAllTables()
                         db.routineDao().insertAll(SeedData.getRoutines())
+                        prefs.edit().putBoolean("is_first_launch", false).apply()
                     }
                 }
             }
