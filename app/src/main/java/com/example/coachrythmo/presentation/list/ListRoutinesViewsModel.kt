@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coachrythmo.data.source.RoutineDao
-import com.example.coachrythmo.domain.model.Routine
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.presentation.toEntity
 import com.example.coachrythmo.presentation.toVM
