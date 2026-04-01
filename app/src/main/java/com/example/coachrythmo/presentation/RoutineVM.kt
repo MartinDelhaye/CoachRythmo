@@ -1,13 +1,13 @@
 package com.example.coachrythmo.presentation
 
 import androidx.compose.ui.graphics.Color
+import com.example.coachrythmo.domain.model.Routine
 import com.example.coachrythmo.ui.theme.CREasyDifficulty
 import com.example.coachrythmo.ui.theme.CRHighDifficultyColor
 import com.example.coachrythmo.ui.theme.CRMediumDifficulty
-import kotlin.random.Random
 
 data class RoutineVM(
-    val id: Int = Random.nextInt(),
+    val id: Int = -1,
     val name: String,
     val description: String = "",
     val category: String,
@@ -16,7 +16,6 @@ data class RoutineVM(
     val difficulty: DifficultyType,
     val durationMinutes: Int? = null
 )
-
 
 sealed class DifficultyType(
     val color: Color,
@@ -38,55 +37,32 @@ data object EasyDifficulty : DifficultyType(
     "Facile"
 )
 
-
-private val routinesList = mutableListOf(
-    RoutineVM(
-        id = 1,
-        name = "Push",
-        description = "Description",
-        category = "Pectoraux / Triceps",
-        day = "Lundi",
-        startTime = "20:00",
-        difficulty = EasyDifficulty,
-        durationMinutes = 45
-    ),
-    RoutineVM(
-        id = 2,
-        name = "Pull",
-        description = "Description",
-        category = "Dos / Biceps",
-        day = "Mercredi",
-        startTime = "18:30",
-        difficulty = StandardDifficulty,
-        durationMinutes = 30
-    ),
-    RoutineVM(
-        id = 3,
-        name = "Leg Day",
-        description = "Description",
-        category = "Jambes",
-        day = "Vendredi",
-        startTime = "19:00",
-        difficulty = HighDifficulty,
-        durationMinutes = 60
-    ),
-    RoutineVM(
-        id = 4,
-        name = "Cardio",
-        description = "Description",
-        category = "Endurance",
-        day = "Dimanche",
-        startTime = "10:00",
-        difficulty = StandardDifficulty,
-        durationMinutes = 30
+fun RoutineVM.toEntity(): Routine {
+    return Routine(
+        id = id,
+        name = name,
+        description = description,
+        category = category,
+        day = day,
+        startTime = startTime,
+        difficulty = difficulty.text, // on stock en String
+        durationMinutes = durationMinutes
     )
-)
-
-fun getRoutines() : List<RoutineVM>
-{
-    return routinesList
 }
 
-fun addRoutine(routine: RoutineVM) {
-    routinesList.add(routine)
+fun Routine.toVM(): RoutineVM {
+    return RoutineVM(
+        name = name,
+        description = description,
+        category = category,
+        day = day,
+        startTime = startTime,
+        difficulty = when (difficulty) {
+            "Facile" -> EasyDifficulty
+            "Moyen" -> StandardDifficulty
+            "Difficile" -> HighDifficulty
+            else -> EasyDifficulty
+        },
+        durationMinutes = durationMinutes
+    )
 }
