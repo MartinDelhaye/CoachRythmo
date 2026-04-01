@@ -1,4 +1,4 @@
-package com.example.coachrythmo.model
+package com.example.coachrythmo.domain.model
 
 data class CalendarItem(
     val dayNumber: Int,

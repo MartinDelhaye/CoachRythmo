@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.coachrythmo.model.CalendarItem
+import com.example.coachrythmo.domain.model.CalendarItem
 import com.example.coachrythmo.ui.theme.CRDark
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 import com.example.coachrythmo.ui.theme.CRWhite

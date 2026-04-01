@@ -8,24 +8,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.coachrythmo.presentation.RoutineVM
-import java.time.DayOfWeek
-import java.time.LocalDate
+import com.example.coachrythmo.presentation.home.UpcomingSession
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun UpcomingSessions(routines: List<RoutineVM>) {
+fun UpcomingSessions(sessions: List<UpcomingSession>) {
 
     val formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM", Locale.FRENCH)
-    val todayIndex = LocalDate.now().dayOfWeek.value
-
-    val upcoming = routines
-        .filter { dayToIndex(it.day) > todayIndex }
-        .sortedBy { dayToIndex(it.day) }
 
     Column {
-
         Text(
             text = "Séances des prochains jours",
             style = MaterialTheme.typography.titleMedium
@@ -33,60 +25,27 @@ fun UpcomingSessions(routines: List<RoutineVM>) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        upcoming.forEach { routine ->
+        if (sessions.isEmpty()) {
+            Text(
+                text = "Aucune séance prévue. Ajoute ta première routine !",
+                style = MaterialTheme.typography.bodyMedium,
+                color = androidx.compose.ui.graphics.Color.Gray
+            )
+        } else {
+            sessions.forEach { session ->
+                Column {
+                    val formattedDate = session.date.format(formatter)
+                        .replaceFirstChar { it.uppercase() }
 
-            Column {
+                    Text(text = formattedDate)
 
-                val date = getNextDateForDay(routine.day)
-                val formattedDate = date.format(formatter)
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = formattedDate.replaceFirstChar { it.uppercase() }
-                )
+                    RoutineCard(routine = session.routine)
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                RoutineCard(routine = routine)
-
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
         }
     }
-}
-
-fun dayToIndex(day: String): Int {
-    return when(day.lowercase()) {
-        "lundi" -> 1
-        "mardi" -> 2
-        "mercredi" -> 3
-        "jeudi" -> 4
-        "vendredi" -> 5
-        "samedi" -> 6
-        "dimanche" -> 7
-        else -> 0
-    }
-}
-
-fun getNextDateForDay(day: String): LocalDate {
-
-    val today = LocalDate.now()
-
-    val targetDay = when(day.lowercase()) {
-        "lundi" -> DayOfWeek.MONDAY
-        "mardi" -> DayOfWeek.TUESDAY
-        "mercredi" -> DayOfWeek.WEDNESDAY
-        "jeudi" -> DayOfWeek.THURSDAY
-        "vendredi" -> DayOfWeek.FRIDAY
-        "samedi" -> DayOfWeek.SATURDAY
-        "dimanche" -> DayOfWeek.SUNDAY
-        else -> DayOfWeek.MONDAY
-    }
-
-    var date = today
-
-    while (date.dayOfWeek != targetDay) {
-        date = date.plusDays(1)
-    }
-
-    return date
 }
