@@ -60,8 +60,6 @@ class HomeViewModel(
                     val candidatesThisWeek = routines
                         .filter { routine ->
                             val dayIdx = dayToIndex(routine.day)
-                            // Semaine courante : seulement les jours strictement après aujourd'hui
-                            // Semaines suivantes : tous les jours
                             if (weekOffset == 0L) dayIdx > todayIndex else true
                         }
                         .map { routine ->

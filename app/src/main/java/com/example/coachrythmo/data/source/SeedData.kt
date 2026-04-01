@@ -12,7 +12,7 @@ object SeedData {
                 category = "Pectoraux / Triceps",
                 day = "Lundi",
                 startTime = "20:00",
-                difficulty = "Facile",
+                difficulty = DifficultyType.EASY,
                 durationMinutes = 45
             ),
             Routine(
@@ -21,7 +21,7 @@ object SeedData {
                 category = "Dos / Biceps",
                 day = "Mercredi",
                 startTime = "18:30",
-                difficulty = "Moyen",
+                difficulty = DifficultyType.MEDIUM,
                 durationMinutes = 30
             )
         )

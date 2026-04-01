@@ -13,6 +13,6 @@ data class Routine(
     val category: String,
     val day: String,
     val startTime: String,
-    val difficulty: String,
+    val difficulty: DifficultyType,
     val durationMinutes: Int?
 )

@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
 import com.example.coachrythmo.data.source.SeedData
 import com.example.coachrythmo.navigation.Screen
@@ -28,11 +29,13 @@ import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
-        androidx.room.Room.databaseBuilder(
+        Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration(false)
+            .build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
