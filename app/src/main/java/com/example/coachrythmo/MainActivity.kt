@@ -9,32 +9,68 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
+import com.example.coachrythmo.data.source.AppDatabase
+import com.example.coachrythmo.data.source.SeedData
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.components.CustomMenu
 import com.example.coachrythmo.presentation.home.HomeScreen
+import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 
 class MainActivity : ComponentActivity() {
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            AppDatabase.DATABASE_NAME
+        )
+            .fallbackToDestructiveMigration(false)
+            .build()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+
+                    val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                    val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
+
+                    if (isFirstLaunch) {
+                        db.clearAllTables()
+                        db.routineDao().insertAll(SeedData.getRoutines())
+                        prefs.edit().putBoolean("is_first_launch", false).apply()
+                    }
+                }
+            }
             CoachRythmoTheme {
                 val navController = rememberNavController()
-                val sharedViewModel = viewModel<ListRoutinesViewsModel>()
+
+                // ViewModel partagé pour la liste des routines
+                val listViewModel = viewModel<ListRoutinesViewsModel> {
+                    ListRoutinesViewsModel(db.routineDao())
+                }
+
+                // ViewModel dédié au HomeScreen
+                val homeViewModel = viewModel<HomeViewModel> {
+                    HomeViewModel(db.routineDao())
+                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        CustomMenu(navController)
-                    }
+                    bottomBar = { CustomMenu(navController) }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -42,16 +78,15 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen(navController)
+                            HomeScreen(navController, homeViewModel)
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
-                            ListRoutinesScreen(navController, sharedViewModel)
+                            ListRoutinesScreen(navController, listViewModel)
                         }
 
-                        // Ta route ajoutée
                         composable(Screen.AddRoutineScreen.route) {
-                            AddRoutineScreen(navController, sharedViewModel)
+                            AddRoutineScreen(navController, listViewModel)
                         }
 
                         composable(Screen.SuiviScreen.route) {

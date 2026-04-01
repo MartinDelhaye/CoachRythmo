@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.coachrythmo.presentation.DifficultyType
+import com.example.coachrythmo.domain.model.DifficultyType
 
 @Composable
 fun DifficultyBadge(
@@ -26,7 +26,7 @@ fun DifficultyBadge(
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = difficulty.text,
+            text = difficulty.label,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White
