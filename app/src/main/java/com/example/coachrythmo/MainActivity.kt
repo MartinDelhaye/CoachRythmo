@@ -26,6 +26,9 @@ import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
+import com.example.coachrythmo.auth.AuthManager
+import com.example.coachrythmo.presentation.auth.LoginScreen
+import com.example.coachrythmo.presentation.auth.VerifyCodeScreen
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -42,6 +45,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val authManager = AuthManager(applicationContext)
+
+            val startDestination = if (authManager.isLoggedIn()) {
+                Screen.HomeScreen.route
+            } else {
+                Screen.Login.route
+            }
             LaunchedEffect(Unit) {
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
 
@@ -74,9 +84,17 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.HomeScreen.route,
+                        startDestination = startDestination,
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable(Screen.Login.route) {
+                            LoginScreen(navController, authManager)
+                        }
+
+                        composable(Screen.Verify.route) {
+                            VerifyCodeScreen(navController, authManager)
+                        }
+
                         composable(Screen.HomeScreen.route) {
                             HomeScreen(navController, homeViewModel)
                         }
