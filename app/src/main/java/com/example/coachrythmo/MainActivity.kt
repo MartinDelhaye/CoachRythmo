@@ -25,7 +25,11 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
+import com.example.coachrythmo.presentation.session.SessionScreen
+import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -34,36 +38,34 @@ class MainActivity : ComponentActivity() {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration(false)
+            .fallbackToDestructiveMigration(true)
             .build()
     }
+
+    private val dev = true;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LaunchedEffect(Unit) {
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-
-                    val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-                    val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
-
-                    if (isFirstLaunch) {
-                        db.clearAllTables()
-                        db.routineDao().insertAll(SeedData.getRoutines())
-                        prefs.edit().putBoolean("is_first_launch", false).apply()
+                withContext(Dispatchers.IO) {
+                    if (db.routineDao().count() == 0 || dev) {
+                        SeedData.seedDatabase(
+                            db.routineDao(),
+                            db.exerciseDao(),
+                            db.routineExerciseDao()
+                        )
                     }
                 }
             }
+
             CoachRythmoTheme {
                 val navController = rememberNavController()
 
-                // ViewModel partagé pour la liste des routines
                 val listViewModel = viewModel<ListRoutinesViewsModel> {
                     ListRoutinesViewsModel(db.routineDao())
                 }
-
-                // ViewModel dédié au HomeScreen
                 val homeViewModel = viewModel<HomeViewModel> {
                     HomeViewModel(db.routineDao())
                 }
@@ -95,6 +97,22 @@ class MainActivity : ComponentActivity() {
 
                         composable(Screen.CompteScreen.route) {
                             Text("Page Compte", style = MaterialTheme.typography.titleLarge)
+                        }
+
+                        composable(Screen.SessionScreen.route) { backStackEntry ->
+                            val routineId = backStackEntry.arguments
+                                ?.getString("routineId")
+                                ?.toIntOrNull()
+
+                            val sessionViewModel = viewModel<SessionViewModel> {
+                                SessionViewModel(
+                                    routineDao         = db.routineDao(),
+                                    routineExerciseDao = db.routineExerciseDao(),
+                                    sessionDao         = db.sessionDao(),
+                                    routineId          = routineId
+                                )
+                            }
+                            SessionScreen(sessionViewModel, navController)
                         }
                     }
                 }

@@ -4,46 +4,70 @@ import com.example.coachrythmo.domain.model.*
 
 object SeedData {
 
+    suspend fun seedDatabase(
+        routineDao: RoutineDao,
+        exerciseDao: ExerciseDao,
+        crossRefDao: RoutineExerciseDao
+    ) {
+        routineDao.clear()
+        exerciseDao.clear()
 
-    fun getRoutines(): List<Routine> {
-        return listOf(
+        val exercises = listOf(
+            Exercise(name = "Développé couché", category = "Pectoraux"),
+            Exercise(name = "Pompes",           category = "Pectoraux"),
+            Exercise(name = "Tractions",        category = "Dos"),
+            Exercise(name = "Curl biceps",      category = "Dos"),
+            Exercise(name = "Squats",           category = "Jambes"),
+            Exercise(name = "Fentes",           category = "Jambes"),
+            Exercise(name = "Course à pied",    category = "Cardio")
+        )
+        exerciseDao.insertAll(exercises)
+        val insertedExercises = exerciseDao.getAllNow()
+
+        val routines = listOf(
             Routine(
                 name = "Push",
-                description = "Description",
+                description = "Pecs / triceps",
                 category = "Pectoraux / Triceps",
                 day = "Lundi",
                 startTime = "20:00",
-                difficulty = DifficultyType.EASY,
+                difficulty = Difficulty.EASY,
                 durationMinutes = 45
             ),
             Routine(
                 name = "Pull",
-                description = "Description",
+                description = "Dos / biceps",
                 category = "Dos / Biceps",
-                day = "Mercredi",
+                day = "Jeudi",
                 startTime = "18:30",
-                difficulty = DifficultyType.MEDIUM,
+                difficulty = Difficulty.MEDIUM,
                 durationMinutes = 30
             ),
             Routine(
                 name = "Leg Day",
-                description = "Description",
+                description = "Jambes complètes",
                 category = "Jambes",
                 day = "Vendredi",
                 startTime = "19:00",
-                difficulty = DifficultyType.HARD,
+                difficulty = Difficulty.HARD,
                 durationMinutes = 60
-
-            ),
-            Routine(
-                name = "Cardio",
-                description = "Description",
-                category = "Endurance",
-                day = "Dimanche",
-                startTime = "10:00",
-                difficulty = DifficultyType.MEDIUM,
-                durationMinutes = 30
             )
         )
+        routineDao.insertAll(routines)
+        val insertedRoutines = routineDao.getAllNow()
+
+        val push = insertedRoutines.first { it.name == "Push" }
+        val pull = insertedRoutines.first { it.name == "Pull" }
+        val legs = insertedRoutines.first { it.name == "Leg Day" }
+
+        val crossRefs = listOf(
+            RoutineExerciseCrossRef(push.id!!, insertedExercises.first { it.name == "Développé couché" }.id!!),
+            RoutineExerciseCrossRef(push.id,   insertedExercises.first { it.name == "Pompes" }.id!!),
+            RoutineExerciseCrossRef(pull.id!!, insertedExercises.first { it.name == "Tractions" }.id!!),
+            RoutineExerciseCrossRef(pull.id,   insertedExercises.first { it.name == "Curl biceps" }.id!!),
+            RoutineExerciseCrossRef(legs.id!!, insertedExercises.first { it.name == "Squats" }.id!!),
+            RoutineExerciseCrossRef(legs.id,   insertedExercises.first { it.name == "Fentes" }.id!!)
+        )
+        crossRefDao.insertAll(crossRefs)
     }
 }

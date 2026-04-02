@@ -14,11 +14,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 
 @Composable
-fun TodaySession(routine: RoutineVM) {
+fun TodaySession(
+    navController: NavController,
+    routine: RoutineVM
+) {
     Column{
         Text(
             text = "Séance du jour",
@@ -49,7 +54,11 @@ fun TodaySession(routine: RoutineVM) {
             horizontalArrangement = Arrangement.Start
         ) {
             Button(
-                onClick = { },
+                onClick = {
+                    navController.navigate(
+                        Screen.SessionScreen.createRoute(routine.id!!)
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = CRPrimaryRed
                 ),

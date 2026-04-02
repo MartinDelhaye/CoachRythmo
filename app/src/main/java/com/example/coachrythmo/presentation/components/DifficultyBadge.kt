@@ -11,18 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.coachrythmo.domain.model.DifficultyType
+import com.example.coachrythmo.domain.model.Difficulty
 
 @Composable
-fun DifficultyBadge(
-    difficulty: DifficultyType
-) {
+fun DifficultyBadge(difficulty: Difficulty) {
     Box(
         modifier = Modifier
-            .background(
-                color = difficulty.color,
-                shape = RoundedCornerShape(50)
-            )
+            .background(color = difficulty.color, shape = RoundedCornerShape(50))
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(

@@ -34,7 +34,10 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             WeekCalendar()
 
             if (todayRoutine != null) {
-                TodaySession(todayRoutine!!)
+                TodaySession(
+                    navController,
+                    todayRoutine!!
+                )
             } else {
                 Text(
                     text = "Aucune séance prévue aujourd'hui 🎉",
