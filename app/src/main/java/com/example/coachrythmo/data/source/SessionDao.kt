@@ -12,4 +12,18 @@ interface SessionDao {
 
     @Insert
     suspend fun insertSessionExercise(sessionExercise: SessionExercise)
+
+    @Query(
+    """
+    SELECT COUNT(*) FROM sessions 
+    WHERE date BETWEEN :start AND :end
+    """)
+    suspend fun countSessionsBetween(start: Long, end: Long): Int
+
+
+    @Query("DELETE FROM sessions")
+    suspend fun clearSessions()
+
+    @Query("DELETE FROM session_exercises")
+    suspend fun clearSessionExercises()
 }

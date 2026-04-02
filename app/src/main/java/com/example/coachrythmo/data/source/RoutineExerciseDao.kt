@@ -19,4 +19,7 @@ interface RoutineExerciseDao {
         WHERE routine_exercise.routineId = :routineId
     """)
     suspend fun getExercisesForRoutine(routineId: Int): List<Exercise>
+
+    @Query("DELETE FROM routine_exercise")
+    suspend fun clear()
 }

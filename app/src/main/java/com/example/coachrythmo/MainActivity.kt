@@ -17,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
-import com.example.coachrythmo.data.source.SeedData
+import com.example.coachrythmo.data.seed.SeedManager
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.components.CustomMenu
 import com.example.coachrythmo.presentation.home.HomeScreen
@@ -51,10 +51,11 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 withContext(Dispatchers.IO) {
                     if (db.routineDao().count() == 0 || dev) {
-                        SeedData.seedDatabase(
+                        SeedManager.seedDatabase(
                             db.routineDao(),
                             db.exerciseDao(),
-                            db.routineExerciseDao()
+                            db.routineExerciseDao(),
+                            db.sessionDao()
                         )
                     }
                 }
@@ -67,12 +68,21 @@ class MainActivity : ComponentActivity() {
                     ListRoutinesViewsModel(db.routineDao())
                 }
                 val homeViewModel = viewModel<HomeViewModel> {
-                    HomeViewModel(db.routineDao())
+                    HomeViewModel(
+                        db.routineDao(),
+                        db.sessionDao()
+                    )
                 }
+
+                val currentRoute = navController.currentBackStackEntry?.destination?.route
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = { CustomMenu(navController) }
+                    bottomBar = {
+                        if (currentRoute?.startsWith("session_screen") != true) {
+                            CustomMenu(navController)
+                        }
+                    }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
