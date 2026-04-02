@@ -103,13 +103,6 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.CompteScreen.route) {
                             Text("Page Compte", style = MaterialTheme.typography.titleLarge)
                         }
-                        composable(
-                            route = Screen.StartRoutineScreen.route,
-                            arguments = listOf(navArgument("routineId") { type = NavType.IntType })
-                        ) { backStackEntry ->
-                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
-                            // StartRoutineScreen(navController, listViewModel, routineId) // à décommenter quand la page sera créée
-                        }
                     }
                 }
             }
