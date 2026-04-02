@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
 import com.example.coachrythmo.data.source.SeedData
@@ -25,6 +27,7 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
+import com.example.coachrythmo.presentation.list.RoutineDetailScreen
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,10 +47,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             LaunchedEffect(Unit) {
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-
                     val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
                     val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
-
                     if (isFirstLaunch) {
                         db.clearAllTables()
                         db.routineDao().insertAll(SeedData.getRoutines())
@@ -58,12 +59,10 @@ class MainActivity : ComponentActivity() {
             CoachRythmoTheme {
                 val navController = rememberNavController()
 
-                // ViewModel partagé pour la liste des routines
                 val listViewModel = viewModel<ListRoutinesViewsModel> {
                     ListRoutinesViewsModel(db.routineDao())
                 }
 
-                // ViewModel dédié au HomeScreen
                 val homeViewModel = viewModel<HomeViewModel> {
                     HomeViewModel(db.routineDao())
                 }
@@ -89,12 +88,27 @@ class MainActivity : ComponentActivity() {
                             AddRoutineScreen(navController, listViewModel)
                         }
 
+                        composable(
+                            route = Screen.RoutineDetailScreen.route,
+                            arguments = listOf(navArgument("routineId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
+                            RoutineDetailScreen(navController, listViewModel, routineId)
+                        }
+
                         composable(Screen.SuiviScreen.route) {
                             Text("Page Suivi", style = MaterialTheme.typography.titleLarge)
                         }
 
                         composable(Screen.CompteScreen.route) {
                             Text("Page Compte", style = MaterialTheme.typography.titleLarge)
+                        }
+                        composable(
+                            route = Screen.StartRoutineScreen.route,
+                            arguments = listOf(navArgument("routineId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
+                            // StartRoutineScreen(navController, listViewModel, routineId) // à décommenter quand la page sera créée
                         }
                     }
                 }

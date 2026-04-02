@@ -15,11 +15,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
+import androidx.compose.foundation.clickable
 
 @Composable
-fun RoutineCard(routine: RoutineVM, modifier: Modifier = Modifier) {
+fun RoutineCard(
+    routine: RoutineVM,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF0F0)),
         elevation = CardDefaults.cardElevation(0.dp)

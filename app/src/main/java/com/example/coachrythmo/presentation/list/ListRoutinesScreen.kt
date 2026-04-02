@@ -134,7 +134,14 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
 
         LazyColumn {
             items(filteredRoutines) { routine ->
-                RoutineCard(routine = routine)
+                RoutineCard(
+                    routine = routine,
+                    onClick = {
+                        navController.navigate(
+                            Screen.RoutineDetailScreen.createRoute(routine.id)
+                        )
+                    }
+                )
             }
         }
     }
