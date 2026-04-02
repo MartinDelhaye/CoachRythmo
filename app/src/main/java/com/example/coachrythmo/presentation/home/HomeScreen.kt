@@ -14,9 +14,16 @@ import com.example.coachrythmo.presentation.components.AppScreen
 import com.example.coachrythmo.presentation.components.TodaySession
 import com.example.coachrythmo.presentation.components.UpcomingSessions
 import com.example.coachrythmo.presentation.components.WeekCalendar
+import androidx.compose.material3.Button
+import com.example.coachrythmo.navigation.Screen
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel,
+    authManager: com.example.coachrythmo.auth.AuthManager
+)
+ {
 
     val todayRoutine by viewModel.todayRoutine
     val upcomingSessions by viewModel.upcomingSessions
@@ -43,6 +50,18 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             }
 
             UpcomingSessions(upcomingSessions)
+            Button(
+                onClick = {
+                    authManager.logout()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Se déconnecter")
+            }
+
         }
     }
 }

@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen(navController, homeViewModel)
+                            HomeScreen(navController, homeViewModel, authManager)
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
