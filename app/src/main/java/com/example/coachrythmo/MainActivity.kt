@@ -27,6 +27,8 @@ import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
+import com.example.coachrythmo.presentation.compte.CompteScreen
+import com.example.coachrythmo.presentation.compte.CompteViewModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -74,6 +76,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                val compteViewModel = viewModel<CompteViewModel> {
+                    CompteViewModel()
+                }
+
                 val currentRoute = navController.currentBackStackEntry?.destination?.route
 
                 Scaffold(
@@ -106,7 +112,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Screen.CompteScreen.route) {
-                            Text("Page Compte", style = MaterialTheme.typography.titleLarge)
+                            CompteScreen(
+                                navController,
+                                compteViewModel
+                            )
                         }
 
                         composable(Screen.SessionScreen.route) { backStackEntry ->
