@@ -5,13 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coachrythmo.data.source.RoutineDao
+import com.example.coachrythmo.data.source.SessionDao
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.presentation.toVM
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.Calendar
 
 data class UpcomingSession(
     val routine: RoutineVM,
@@ -19,7 +22,8 @@ data class UpcomingSession(
 )
 
 class HomeViewModel(
-    private val dao: RoutineDao
+    private val dao: RoutineDao,
+    private val sessionDao: SessionDao
 ) : ViewModel() {
 
     private val _todayRoutine = mutableStateOf<RoutineVM?>(null)
@@ -27,6 +31,9 @@ class HomeViewModel(
 
     private val _upcomingSessions = mutableStateOf<List<UpcomingSession>>(emptyList())
     val upcomingSessions: State<List<UpcomingSession>> = _upcomingSessions
+
+    private val _sessionDoneToday = mutableStateOf(false)
+    val sessionDoneToday: State<Boolean> = _sessionDoneToday
 
     private var job: Job? = null
 
@@ -88,5 +95,33 @@ class HomeViewModel(
             "dimanche" -> 7
             else       -> 0
         }
+    }
+
+    fun checkIfSessionDoneToday() {
+        viewModelScope.launch {
+            val startOfDay = getStartOfDay()
+            val endOfDay = getEndOfDay()
+
+            val count = sessionDao.countSessionsBetween(startOfDay, endOfDay)
+            _sessionDoneToday.value = count > 0
+        }
+    }
+
+    fun getStartOfDay(): Long {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
+    }
+
+    fun getEndOfDay(): Long {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, 23)
+        cal.set(Calendar.MINUTE, 59)
+        cal.set(Calendar.SECOND, 59)
+        cal.set(Calendar.MILLISECOND, 999)
+        return cal.timeInMillis
     }
 }

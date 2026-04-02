@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,11 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 
     val todayRoutine by viewModel.todayRoutine
     val upcomingSessions by viewModel.upcomingSessions
+    val sessionDone by viewModel.sessionDoneToday
+
+    LaunchedEffect(Unit) {
+        viewModel.checkIfSessionDoneToday()
+    }
 
     AppScreen(
         navController = navController,
@@ -34,7 +40,13 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             WeekCalendar()
 
             if (todayRoutine != null) {
-                TodaySession(todayRoutine!!)
+
+                if (sessionDone) {
+                    Text("Séance déjà effectuée aujourd’hui ✅")
+                } else {
+                    TodaySession(navController, todayRoutine!!)
+                }
+
             } else {
                 Text(
                     text = "Aucune séance prévue aujourd'hui 🎉",

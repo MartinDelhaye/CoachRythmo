@@ -7,12 +7,11 @@ import androidx.room.PrimaryKey
 data class Routine(
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
-
     val name: String,
     val description: String,
     val category: String,
     val day: String,
     val startTime: String,
-    val difficulty: DifficultyType,
+    val difficulty: Difficulty,
     val durationMinutes: Int?
 )

@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.coachrythmo.domain.model.DifficultyType
+import com.example.coachrythmo.domain.model.Difficulty
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 
@@ -28,13 +28,9 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
     var selectedDay by remember { mutableStateOf("Lundi") }
     var startTime by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
-
-    var selectedDifficulty by remember { mutableStateOf(DifficultyType.EASY) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
 
     val days = listOf("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
-
-    val difficulties = DifficultyType.values().toList()
-
     var dayExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -50,7 +46,6 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -58,7 +53,6 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -95,15 +89,12 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Jour *") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayExpanded)
-                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayExpanded) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
                     shape = RoundedCornerShape(12.dp)
                 )
-
                 ExposedDropdownMenu(
                     expanded = dayExpanded,
                     onDismissRequest = { dayExpanded = false }
@@ -111,10 +102,7 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                     days.forEach { day ->
                         DropdownMenuItem(
                             text = { Text(day) },
-                            onClick = {
-                                selectedDay = day
-                                dayExpanded = false
-                            }
+                            onClick = { selectedDay = day; dayExpanded = false }
                         )
                     }
                 }
@@ -139,9 +127,8 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
             Text("Difficulté *", fontSize = 16.sp, fontWeight = FontWeight.Medium)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                difficulties.forEach { diff ->
+                Difficulty.entries.forEach { diff ->
                     val isSelected = selectedDifficulty == diff
-
                     FilterChip(
                         selected = isSelected,
                         onClick = { selectedDifficulty = diff },
@@ -160,33 +147,25 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
             Button(
                 onClick = {
                     if (name.isNotBlank() && category.isNotBlank() && startTime.isNotBlank()) {
-
-                        val newRoutine = RoutineVM(
-                            name = name,
-                            description = description,
-                            category = category,
-                            day = selectedDay,
-                            startTime = startTime,
-                            difficulty = selectedDifficulty,
-                            durationMinutes = duration.toIntOrNull()
+                        viewModel.saveRoutine(
+                            RoutineVM(
+                                name = name,
+                                description = description,
+                                category = category,
+                                day = selectedDay,
+                                startTime = startTime,
+                                difficulty = selectedDifficulty,
+                                durationMinutes = duration.toIntOrNull()
+                            )
                         )
-
-                        viewModel.saveRoutine(newRoutine)
                         navController.popBackStack()
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = CRPrimaryRed)
             ) {
-                Text(
-                    "Enregistrer",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Enregistrer", fontSize = 16.sp, color = Color.White, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

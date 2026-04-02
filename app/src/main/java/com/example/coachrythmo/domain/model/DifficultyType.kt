@@ -1,16 +1,17 @@
 package com.example.coachrythmo.domain.model
 
 import androidx.compose.ui.graphics.Color
-import com.example.coachrythmo.ui.theme.CREasyDifficulty
-import com.example.coachrythmo.ui.theme.CRHighDifficultyColor
-import com.example.coachrythmo.ui.theme.CRMediumDifficulty
 
-enum class DifficultyType(
+enum class Difficulty(
     val label: String,
-    val color: Color,
-    val level: Int
+    val color: Color
 ) {
-    EASY("Facile", CREasyDifficulty, 1),
-    MEDIUM("Moyen", CRMediumDifficulty, 2),
-    HARD("Difficile", CRHighDifficultyColor, 3)
+    EASY("Facile", Color(0xFF4CAF50)),
+    MEDIUM("Moyen", Color(0xFFFF9800)),
+    HARD("Difficile", Color(0xFFF44336));
+
+    companion object {
+        fun fromLabel(label: String): Difficulty =
+            entries.firstOrNull { it.label.equals(label, ignoreCase = true) } ?: EASY
+    }
 }

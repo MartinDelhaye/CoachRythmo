@@ -7,24 +7,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.coachrythmo.domain.model.DifficultyType
+import com.example.coachrythmo.domain.model.Difficulty
 
 @Composable
-fun DifficultyDots(difficulty: DifficultyType) {
-
-    val filledDots = difficulty.level
-
+fun DifficultyDots(difficulty: Difficulty) {
+    val filledDots = when (difficulty) {
+        Difficulty.EASY   -> 1
+        Difficulty.MEDIUM -> 2
+        Difficulty.HARD   -> 3
+    }
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         repeat(3) { index ->
             Box(
                 modifier = Modifier
                     .size(10.dp)
                     .background(
-                        color = if (index < filledDots) {
-                            difficulty.color
-                        } else {
-                            Color.LightGray
-                        },
+                        color = if (index < filledDots) difficulty.color else Color.LightGray,
                         shape = CircleShape
                     )
             )
