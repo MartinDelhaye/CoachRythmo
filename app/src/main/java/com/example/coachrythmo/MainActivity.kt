@@ -12,12 +12,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
-import com.example.coachrythmo.data.seed.SeedManager
+import com.example.coachrythmo.data.source.SeedData
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.components.CustomMenu
 import com.example.coachrythmo.presentation.home.HomeScreen
@@ -25,11 +27,8 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
-import com.example.coachrythmo.presentation.session.SessionScreen
-import com.example.coachrythmo.presentation.session.SessionViewModel
+import com.example.coachrythmo.presentation.list.RoutineDetailScreen
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -38,51 +37,39 @@ class MainActivity : ComponentActivity() {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration(true)
+            .fallbackToDestructiveMigration(false)
             .build()
     }
-
-    private val dev = true;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LaunchedEffect(Unit) {
-                withContext(Dispatchers.IO) {
-                    if (db.routineDao().count() == 0 || dev) {
-                        SeedManager.seedDatabase(
-                            db.routineDao(),
-                            db.exerciseDao(),
-                            db.routineExerciseDao(),
-                            db.sessionDao()
-                        )
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                    val isFirstLaunch = prefs.getBoolean("is_first_launch", true)
+                    if (isFirstLaunch) {
+                        db.clearAllTables()
+                        db.routineDao().insertAll(SeedData.getRoutines())
+                        prefs.edit().putBoolean("is_first_launch", false).apply()
                     }
                 }
             }
-
             CoachRythmoTheme {
                 val navController = rememberNavController()
 
                 val listViewModel = viewModel<ListRoutinesViewsModel> {
                     ListRoutinesViewsModel(db.routineDao())
                 }
-                val homeViewModel = viewModel<HomeViewModel> {
-                    HomeViewModel(
-                        db.routineDao(),
-                        db.sessionDao()
-                    )
-                }
 
-                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                val homeViewModel = viewModel<HomeViewModel> {
+                    HomeViewModel(db.routineDao())
+                }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (currentRoute?.startsWith("session_screen") != true) {
-                            CustomMenu(navController)
-                        }
-                    }
+                    bottomBar = { CustomMenu(navController) }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -101,6 +88,14 @@ class MainActivity : ComponentActivity() {
                             AddRoutineScreen(navController, listViewModel)
                         }
 
+                        composable(
+                            route = Screen.RoutineDetailScreen.route,
+                            arguments = listOf(navArgument("routineId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
+                            RoutineDetailScreen(navController, listViewModel, routineId)
+                        }
+
                         composable(Screen.SuiviScreen.route) {
                             Text("Page Suivi", style = MaterialTheme.typography.titleLarge)
                         }
@@ -108,21 +103,12 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.CompteScreen.route) {
                             Text("Page Compte", style = MaterialTheme.typography.titleLarge)
                         }
-
-                        composable(Screen.SessionScreen.route) { backStackEntry ->
-                            val routineId = backStackEntry.arguments
-                                ?.getString("routineId")
-                                ?.toIntOrNull()
-
-                            val sessionViewModel = viewModel<SessionViewModel> {
-                                SessionViewModel(
-                                    routineDao         = db.routineDao(),
-                                    routineExerciseDao = db.routineExerciseDao(),
-                                    sessionDao         = db.sessionDao(),
-                                    routineId          = routineId
-                                )
-                            }
-                            SessionScreen(sessionViewModel, navController)
+                        composable(
+                            route = Screen.StartRoutineScreen.route,
+                            arguments = listOf(navArgument("routineId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
+                            // StartRoutineScreen(navController, listViewModel, routineId) // à décommenter quand la page sera créée
                         }
                     }
                 }
