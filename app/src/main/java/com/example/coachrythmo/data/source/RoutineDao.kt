@@ -3,8 +3,6 @@ package com.example.coachrythmo.data.source
 import androidx.room.*
 import com.example.coachrythmo.domain.model.Routine
 import com.example.coachrythmo.domain.model.RoutineExerciseCrossRef
-import com.example.coachrythmo.domain.model.Session
-import com.example.coachrythmo.domain.model.SessionExercise
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -27,9 +25,6 @@ interface RoutineDao {
     suspend fun count(): Int
     @Insert
     suspend fun insertAll(routines: List<Routine>)
-    @Query("SELECT * FROM routines")
-    suspend fun getAllNow(): List<Routine>
-
     @Query("SELECT * FROM routines")
     suspend fun getAll(): List<Routine>
     @Query("DELETE FROM routines")

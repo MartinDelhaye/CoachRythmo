@@ -6,10 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavController
 import com.example.coachrythmo.presentation.components.AppScreen
 import com.example.coachrythmo.presentation.components.SessionCard
-import com.example.coachrythmo.domain.model.Session
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun SuiviScreen(
@@ -25,18 +23,19 @@ fun SuiviScreen(
         navController = navController,
         title = "Suivi"
     ) {
-        sessions.forEach { item ->
+        sessions.forEach { session ->
 
-            val formattedDate = formatter.format(Date(item.session.date))
+            val formattedDate = formatter.format(Date(session.date))
                 .replaceFirstChar { it.uppercase() }
 
             SessionCard(
-                session = item.session,
+                name = session.name,
+                category = session.category,
+                difficulty = session.difficulty,
                 dateText = formattedDate,
-                done = item.doneExercises,
-                total = item.totalExercises
+                done = session.doneExercises,
+                total = session.totalExercises
             )
         }
     }
 }
-
