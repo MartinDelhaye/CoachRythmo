@@ -62,7 +62,7 @@ object SeedManager {
                 SessionExercise(
                     sessionId = sessionId,
                     exerciseId = exerciseId,
-                    isDone = true
+                    isDone = index % 2 == 0
                 )
             }
         }
