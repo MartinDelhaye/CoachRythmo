@@ -15,4 +15,5 @@ object ExerciseSeed {
             Exercise(name = "Course à pied", category = "Cardio")
         )
     }
+
 }

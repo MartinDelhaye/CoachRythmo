@@ -49,6 +49,7 @@ class SessionViewModel(
 
     private fun loadData() {
         if (routineId == null) return
+
         viewModelScope.launch {
             val entity = routineDao.getRoutineById(routineId)
             _routine.value = entity?.toVM()
@@ -59,7 +60,7 @@ class SessionViewModel(
     private fun startTimer() {
         timerJob = viewModelScope.launch {
             while (true) {
-                delay(1_000)
+                delay(1000)
                 _elapsedSeconds.value++
             }
         }
@@ -67,7 +68,9 @@ class SessionViewModel(
 
     fun toggleExercise(exerciseId: Int) {
         val current = _doneExerciseIds.value.toMutableSet()
-        if (exerciseId in current) current.remove(exerciseId) else current.add(exerciseId)
+        if (current.contains(exerciseId)) current.remove(exerciseId)
+        else current.add(exerciseId)
+
         _doneExerciseIds.value = current
     }
 
@@ -76,14 +79,15 @@ class SessionViewModel(
         timerJob?.cancel()
 
         viewModelScope.launch {
-            val session = Session(
-                name = routine.name,
-                category = routine.category,
-                difficulty = routine.difficulty,
-                date = startTimestamp,
-                duration = _elapsedSeconds.value
-            )
-            val sessionId = sessionDao.insertSession(session).toInt()
+            val sessionId = sessionDao.insertSession(
+                Session(
+                    name = routine.name,
+                    category = routine.category,
+                    difficulty = routine.difficulty,
+                    date = startTimestamp,
+                    duration = _elapsedSeconds.value
+                )
+            ).toInt()
 
             _exercises.value.forEach { exercise ->
                 sessionDao.insertSessionExercise(

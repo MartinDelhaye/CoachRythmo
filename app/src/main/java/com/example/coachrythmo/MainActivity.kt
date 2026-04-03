@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 val suiviViewModel = viewModel<SuiviViewModel> {
-                    SuiviViewModel(db.routineDao())
+                    SuiviViewModel(db.sessionDao())
                 }
 
 

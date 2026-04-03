@@ -1,66 +1,66 @@
 package com.example.coachrythmo.presentation.suivi
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.coachrythmo.data.source.RoutineDao
-import com.example.coachrythmo.presentation.RoutineVM
+import com.example.coachrythmo.data.source.SessionDao
+import com.example.coachrythmo.data.seed.SessionSeed
+import com.example.coachrythmo.data.seed.SessionExerciseSeed
+import com.example.coachrythmo.domain.model.Session
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.example.coachrythmo.presentation.toVM
-import java.time.DayOfWeek
-import java.time.LocalDate
-
-
 
 class SuiviViewModel(
-    private val dao: RoutineDao
+    private val sessionDao: SessionDao
 ) : ViewModel() {
 
-    private val _routines = mutableStateOf<List<RoutineVM>>(emptyList())
-    val routines: State<List<RoutineVM>> = _routines
+    private val _sessions = MutableStateFlow<List<SessionUI>>(emptyList())
+    val sessions: StateFlow<List<SessionUI>> = _sessions
 
     init {
-        loadRoutines()
+        initData()
     }
 
-    private fun getDateFromDay(day: String, reference: LocalDate): LocalDate {
-
-        val targetDay = when (day.lowercase()) {
-            "lundi" -> DayOfWeek.MONDAY
-            "mardi" -> DayOfWeek.TUESDAY
-            "mercredi" -> DayOfWeek.WEDNESDAY
-            "jeudi" -> DayOfWeek.THURSDAY
-            "vendredi" -> DayOfWeek.FRIDAY
-            "samedi" -> DayOfWeek.SATURDAY
-            "dimanche" -> DayOfWeek.SUNDAY
-            else -> DayOfWeek.MONDAY
-        }
-
-        var date = reference.with(targetDay)
-
-        // IMPORTANT : on récupère la prochaine occurrence
-        if (date.isBefore(reference)) {
-            date = date.plusWeeks(1)
-        }
-
-        return date
-    }
-
-
-    private fun loadRoutines() {
+    private fun initData() {
         viewModelScope.launch {
 
-            val result = dao.getAll()
+            if (sessionDao.count() == 0) {
 
-            val today = LocalDate.now()
+                val sessions = SessionSeed.getSessions()
+                val ids = sessionDao.insertAll(sessions)
 
-            _routines.value = result
-                .sortedBy { routine -> getDateFromDay(routine.day, today) }
-                .map { it.toVM() }
+                val exercises = SessionExerciseSeed.build(ids)
+                sessionDao.insertSessionExercises(exercises)
+            }
+
+            loadSessions()
         }
     }
 
+    private suspend fun loadSessions() {
 
+        val sessions = sessionDao.getAllSessionsOnce()
 
+        val ui = sessions.mapNotNull { session ->
+
+            val id = session.id ?: return@mapNotNull null
+
+            val total = sessionDao.countExercises(id)
+            val done = sessionDao.countDoneExercises(id)
+
+            SessionUI(session, done, total)
+        }
+
+        _sessions.value = ui
+    }
+
+    data class SessionUI(
+        val session: Session,
+        val doneExercises: Int,
+        val totalExercises: Int
+    ) {
+        val progress: Float
+            get() = if (totalExercises == 0) 0f
+            else doneExercises.toFloat() / totalExercises
+    }
 }

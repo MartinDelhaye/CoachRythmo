@@ -2,13 +2,13 @@ package com.example.coachrythmo.presentation.suivi
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavController
 import com.example.coachrythmo.presentation.components.AppScreen
-import com.example.coachrythmo.presentation.components.RoutineCardWithDate
-import com.example.coachrythmo.presentation.RoutineVM
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.example.coachrythmo.presentation.components.SessionCard
+import com.example.coachrythmo.domain.model.Session
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -17,49 +17,26 @@ fun SuiviScreen(
     viewModel: SuiviViewModel
 ) {
 
-    val routines by viewModel.routines
+    val sessions by viewModel.sessions.collectAsState()
 
-    val formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM", Locale.FRENCH)
+    val formatter = SimpleDateFormat("EEEE dd MMMM", Locale.FRENCH)
 
     AppScreen(
         navController = navController,
         title = "Suivi"
     ) {
-        routines.forEach { routine ->
+        sessions.forEach { item ->
 
-            val date = getNextDateFromDay(routine.day)
-
-            val formattedDate = date.format(formatter)
+            val formattedDate = formatter.format(Date(item.session.date))
                 .replaceFirstChar { it.uppercase() }
 
-            RoutineCardWithDate(
-                routine = routine,
-                dateText = formattedDate
+            SessionCard(
+                session = item.session,
+                dateText = formattedDate,
+                done = item.doneExercises,
+                total = item.totalExercises
             )
         }
     }
 }
-fun getNextDateFromDay(day: String): LocalDate {
 
-    val today = LocalDate.now()
-
-    val targetDay = when (day.lowercase()) {
-        "lundi" -> DayOfWeek.MONDAY
-        "mardi" -> DayOfWeek.TUESDAY
-        "mercredi" -> DayOfWeek.WEDNESDAY
-        "jeudi" -> DayOfWeek.THURSDAY
-        "vendredi" -> DayOfWeek.FRIDAY
-        "samedi" -> DayOfWeek.SATURDAY
-        "dimanche" -> DayOfWeek.SUNDAY
-        else -> DayOfWeek.MONDAY
-    }
-
-    var date = today.with(targetDay)
-
-    // Si le jour est déjà passé → on prend la semaine suivante
-    if (date.isBefore(today)) {
-        date = date.plusWeeks(1)
-    }
-
-    return date
-}
