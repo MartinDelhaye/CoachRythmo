@@ -7,18 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.coachrythmo.presentation.DifficultyType
-import com.example.coachrythmo.presentation.EasyDifficulty
-import com.example.coachrythmo.presentation.HighDifficulty
-import com.example.coachrythmo.presentation.StandardDifficulty
+import com.example.coachrythmo.domain.model.Difficulty
 
 @Composable
-fun DifficultyDots(difficulty: DifficultyType) {
+fun DifficultyDots(difficulty: Difficulty) {
     val filledDots = when (difficulty) {
-        is EasyDifficulty -> 1
-        is StandardDifficulty -> 2
-        is HighDifficulty -> 3
-        else -> 1
+        Difficulty.EASY   -> 1
+        Difficulty.MEDIUM -> 2
+        Difficulty.HARD   -> 3
     }
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         repeat(3) { index ->

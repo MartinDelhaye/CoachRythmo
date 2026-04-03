@@ -12,14 +12,30 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.coachrythmo.domain.model.Routine
+import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 
 @Composable
-fun TodaySession(routine: RoutineVM) {
-    Column{
+fun TodaySession(
+    navController: NavController,
+    routine: RoutineVM,
+    viewModel: TodaySessionViewModel
+) {
+    val exercises by viewModel.exercises
+
+    LaunchedEffect(routine.id) {
+        routine.id?.let { viewModel.loadExercises(it) }
+    }
+
+    Column {
+
         Text(
             text = "Séance du jour",
             style = MaterialTheme.typography.titleMedium
@@ -37,19 +53,23 @@ fun TodaySession(routine: RoutineVM) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // fake data pour l’instant
-        Text("Glutes - 4 x 15")
-        Text("Squads - 3 x 12")
-        Text("Glutes - 4 x 15")
-        Text("Squads - 3 x 12")
+        // ✅ VRAIS EXOS
+        exercises.forEach { exercise ->
+            ExerciseItem(exercise)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
             Button(
-                onClick = { },
+                onClick = {
+                    navController.navigate(
+                        Screen.SessionScreen.createRoute(routine.id!!)
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = CRPrimaryRed
                 ),

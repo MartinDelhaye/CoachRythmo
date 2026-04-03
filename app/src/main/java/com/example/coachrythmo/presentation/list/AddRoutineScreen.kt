@@ -14,28 +14,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.coachrythmo.presentation.*
+import com.example.coachrythmo.domain.model.Difficulty
+import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
-import androidx.lifecycle.ViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsModel) {
+
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
     var selectedDay by remember { mutableStateOf("Lundi") }
     var startTime by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
-    var selectedDifficulty by remember { mutableStateOf<DifficultyType>(EasyDifficulty) }
+    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
 
     val days = listOf("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
-    val difficulties = listOf(
-        EasyDifficulty as DifficultyType,
-        StandardDifficulty as DifficultyType,
-        HighDifficulty as DifficultyType
-    )
-
     var dayExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -60,38 +55,31 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Nom
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nom de la séance *") },
-                placeholder = { Text("ex : Push, Leg Day...") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // Description
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Description (optionnel)") },
-                placeholder = { Text("Notes personnelles...") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 minLines = 3
             )
 
-            // Catégorie
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Catégorie *") },
-                placeholder = { Text("ex : Pectoraux, Endurance...") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // Jour (Dropdown)
             ExposedDropdownMenuBox(
                 expanded = dayExpanded,
                 onExpandedChange = { dayExpanded = it }
@@ -102,7 +90,9 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                     readOnly = true,
                     label = { Text("Jour *") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
                     shape = RoundedCornerShape(12.dp)
                 )
                 ExposedDropdownMenu(
@@ -118,35 +108,31 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 }
             }
 
-            // Heure de début
             OutlinedTextField(
                 value = startTime,
                 onValueChange = { startTime = it },
                 label = { Text("Heure de début *") },
-                placeholder = { Text("ex : 20:00") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // Durée
             OutlinedTextField(
                 value = duration,
                 onValueChange = { duration = it.filter { c -> c.isDigit() } },
-                label = { Text("Durée approximative en minutes (optionnel)") },
-                placeholder = { Text("ex : 45") },
+                label = { Text("Durée (minutes)") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // Difficulté
             Text("Difficulté *", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                difficulties.forEach { diff ->
+                Difficulty.entries.forEach { diff ->
                     val isSelected = selectedDifficulty == diff
                     FilterChip(
                         selected = isSelected,
                         onClick = { selectedDifficulty = diff },
-                        label = { Text(diff.text) },
+                        label = { Text(diff.label) },
                         shape = RoundedCornerShape(20.dp),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = diff.color,
@@ -158,20 +144,20 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Bouton Enregistrer
             Button(
                 onClick = {
                     if (name.isNotBlank() && category.isNotBlank() && startTime.isNotBlank()) {
-                        val newRoutine = RoutineVM(
-                            name = name,
-                            description = description,
-                            category = category,
-                            day = selectedDay,
-                            startTime = startTime,
-                            difficulty = selectedDifficulty,
-                            durationMinutes = duration.toIntOrNull()
+                        viewModel.saveRoutine(
+                            RoutineVM(
+                                name = name,
+                                description = description,
+                                category = category,
+                                day = selectedDay,
+                                startTime = startTime,
+                                difficulty = selectedDifficulty,
+                                durationMinutes = duration.toIntOrNull()
+                            )
                         )
-                        viewModel.saveRoutine(newRoutine)
                         navController.popBackStack()
                     }
                 },
