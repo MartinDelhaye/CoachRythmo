@@ -22,9 +22,6 @@ fun SessionCard(
     done: Int,
     total: Int
 ) {
-
-    val progress = if (total == 0) 0f else done.toFloat() / total
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,8 +33,6 @@ fun SessionCard(
         Column(
             modifier = Modifier.padding(14.dp)
         ) {
-
-            // 🔹 Ligne du haut
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -59,8 +54,6 @@ fun SessionCard(
                         color = Color.Gray
                     )
                 }
-
-                // 🔥 Badge progression
                 Box(
                     modifier = Modifier
                         .background(CRPrimaryRed, RoundedCornerShape(20.dp))
@@ -76,12 +69,10 @@ fun SessionCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔹 Difficulté (réutilise ton composant)
             DifficultyDots(difficulty)
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔹 Date
             Text(
                 text = dateText,
                 style = MaterialTheme.typography.bodySmall,

@@ -20,6 +20,7 @@ import com.example.coachrythmo.data.source.AppDatabase
 import com.example.coachrythmo.data.seed.SeedManager
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.components.CustomMenu
+import com.example.coachrythmo.presentation.components.TodaySessionViewModel
 import com.example.coachrythmo.presentation.home.HomeScreen
 import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             LaunchedEffect(Unit) {
                 withContext(Dispatchers.IO) {
-                    if (db.routineDao().count() == 0 || dev) {
+                    if (dev) {
                         SeedManager.seedDatabase(
                             db.routineDao(),
                             db.exerciseDao(),
@@ -76,6 +77,10 @@ class MainActivity : ComponentActivity() {
                         db.routineDao(),
                         db.sessionDao()
                     )
+                }
+
+                val todaySessionViewModel = viewModel<TodaySessionViewModel> {
+                    TodaySessionViewModel(db.routineExerciseDao())
                 }
                 val suiviViewModel = viewModel<SuiviViewModel> {
                     SuiviViewModel(db.sessionDao())
@@ -102,7 +107,11 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen(navController, homeViewModel)
+                            HomeScreen(
+                                navController,
+                                homeViewModel,
+                                todaySessionViewModel
+                                )
                         }
 
                         composable(Screen.RoutinesListScreen.route) {

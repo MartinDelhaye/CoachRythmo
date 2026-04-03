@@ -13,11 +13,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.coachrythmo.presentation.components.AppScreen
 import com.example.coachrythmo.presentation.components.TodaySession
+import com.example.coachrythmo.presentation.components.TodaySessionViewModel
 import com.example.coachrythmo.presentation.components.UpcomingSessions
 import com.example.coachrythmo.presentation.components.WeekCalendar
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel,
+    todaySessionViewModel: TodaySessionViewModel
+) {
 
     val todayRoutine by viewModel.todayRoutine
     val upcomingSessions by viewModel.upcomingSessions
@@ -44,7 +49,11 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                 if (sessionDone) {
                     Text("Séance déjà effectuée aujourd’hui ✅")
                 } else {
-                    TodaySession(navController, todayRoutine!!)
+                    TodaySession(
+                        navController = navController,
+                        routine = todayRoutine!!,
+                        viewModel = todaySessionViewModel
+                    )
                 }
 
             } else {
