@@ -32,6 +32,8 @@ import com.example.coachrythmo.presentation.compte.CompteViewModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.example.coachrythmo.presentation.suivi.SuiviViewModel
+import com.example.coachrythmo.presentation.suivi.SuiviScreen
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -75,6 +77,10 @@ class MainActivity : ComponentActivity() {
                         db.sessionDao()
                     )
                 }
+                val suiviViewModel = viewModel<SuiviViewModel> {
+                    SuiviViewModel(db.routineDao())
+                }
+
 
                 val compteViewModel = viewModel<CompteViewModel> {
                     CompteViewModel()
@@ -108,8 +114,9 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Screen.SuiviScreen.route) {
-                            Text("Page Suivi", style = MaterialTheme.typography.titleLarge)
+                            SuiviScreen(navController, suiviViewModel)
                         }
+
 
                         composable(Screen.CompteScreen.route) {
                             CompteScreen(

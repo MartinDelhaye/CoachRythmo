@@ -3,6 +3,7 @@ package com.example.coachrythmo.data.source
 import androidx.room.*
 import com.example.coachrythmo.domain.model.Routine
 import com.example.coachrythmo.domain.model.RoutineExerciseCrossRef
+import com.example.coachrythmo.domain.model.Session
 import com.example.coachrythmo.domain.model.SessionExercise
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +21,7 @@ interface RoutineDao {
     @Query("SELECT * FROM routine_exercise WHERE routineId = :routineId")
     fun getRoutineExercises(routineId: Int): Flow<List<RoutineExerciseCrossRef>>
 
+
     // Pour la seed
     @Query("SELECT COUNT(*) FROM routines")
     suspend fun count(): Int
@@ -27,6 +29,9 @@ interface RoutineDao {
     suspend fun insertAll(routines: List<Routine>)
     @Query("SELECT * FROM routines")
     suspend fun getAllNow(): List<Routine>
+
+    @Query("SELECT * FROM routines")
+    suspend fun getAll(): List<Routine>
     @Query("DELETE FROM routines")
     suspend fun clear()
 }
