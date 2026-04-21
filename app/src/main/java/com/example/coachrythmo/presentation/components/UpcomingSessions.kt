@@ -8,12 +8,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.home.UpcomingSession
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun UpcomingSessions(sessions: List<UpcomingSession>) {
+fun UpcomingSessions(sessions: List<UpcomingSession>, navController: NavController) {
 
     val formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM", Locale.FRENCH)
 
@@ -41,7 +43,12 @@ fun UpcomingSessions(sessions: List<UpcomingSession>) {
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    RoutineCard(routine = session.routine)
+                    RoutineCard(
+                        routine = session.routine,
+                        onClick = {
+                            session.routine.id?.let { navController.navigate(Screen.RoutineDetailScreen.createRoute(it)) }
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(12.dp))
                 }

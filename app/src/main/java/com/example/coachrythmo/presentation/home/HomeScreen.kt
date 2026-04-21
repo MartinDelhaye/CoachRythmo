@@ -54,7 +54,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                 )
             }
 
-            UpcomingSessions(upcomingSessions)
+            UpcomingSessions(upcomingSessions, navController)
         }
     }
 }

@@ -10,10 +10,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
@@ -26,6 +28,7 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
+import com.example.coachrythmo.presentation.list.RoutineDetailScreen
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.presentation.compte.CompteScreen
@@ -91,12 +94,14 @@ class MainActivity : ComponentActivity() {
                     CompteViewModel()
                 }
 
-                val currentRoute = navController.currentBackStackEntry?.destination?.route
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        if (currentRoute?.startsWith("session_screen") != true) {
+                        if (currentRoute?.startsWith("session_screen") != true &&
+                            currentRoute?.startsWith("routine_detail") != true) {
                             CustomMenu(navController)
                         }
                     }
@@ -107,11 +112,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen(
-                                navController,
-                                homeViewModel,
-                                todaySessionViewModel
-                                )
+                            HomeScreen(navController, homeViewModel)
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
@@ -120,6 +121,16 @@ class MainActivity : ComponentActivity() {
 
                         composable(Screen.AddRoutineScreen.route) {
                             AddRoutineScreen(navController, listViewModel)
+                        }
+
+                        composable(
+                            route = Screen.RoutineDetailScreen.route,
+                            arguments = listOf(androidx.navigation.navArgument("routineId") {
+                                type = androidx.navigation.NavType.IntType
+                            })
+                        ) { backStackEntry ->
+                            val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
+                            RoutineDetailScreen(navController, listViewModel, routineId)
                         }
 
                         composable(Screen.SuiviScreen.route) {

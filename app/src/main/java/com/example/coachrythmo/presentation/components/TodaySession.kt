@@ -32,7 +32,12 @@ fun TodaySession(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        RoutineCard(routine = routine)
+        RoutineCard(
+            routine = routine,
+            onClick = {
+                routine.id?.let { navController.navigate(Screen.RoutineDetailScreen.createRoute(it)) }
+            }
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
