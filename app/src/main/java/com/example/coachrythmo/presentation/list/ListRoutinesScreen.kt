@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coachrythmo.navigation.Screen
+import com.example.coachrythmo.presentation.components.AppScreen
 import com.example.coachrythmo.presentation.components.RoutineCard
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 
@@ -38,33 +39,10 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+    AppScreen(
+        navController = navController,
+        title = "Routines"
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Routine", style = MaterialTheme.typography.titleLarge)
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(CRPrimaryRed, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.White,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -109,14 +87,7 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
 
         LazyColumn {
             items(filteredRoutines) { routine ->
-                RoutineCard(
-                    routine = routine,
-                    onClick = {
-                        navController.navigate(
-                            Screen.RoutineDetailScreen.createRoute(routine.id)
-                        )
-                    }
-                )
+                RoutineCard(routine = routine)
             }
         }
     }
