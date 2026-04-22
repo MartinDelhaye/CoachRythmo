@@ -35,6 +35,3 @@ interface RoutineDao {
     @Query("DELETE FROM routines")
     suspend fun clear()
 }
-```
-
-D'autres conflits ? 🙂
