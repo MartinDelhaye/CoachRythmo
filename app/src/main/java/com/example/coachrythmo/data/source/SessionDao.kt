@@ -8,36 +8,52 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SessionDao {
+
+    // Session
     @Insert
     suspend fun insertSession(session: Session): Long
 
+    @Query("SELECT * FROM sessions ORDER BY date DESC")
+    fun getSessions(): Flow<List<Session>>
+
+    // SessionExercise
     @Insert
     suspend fun insertSessionExercise(sessionExercise: SessionExercise)
 
-    @Query(
-    """
-    SELECT COUNT(*) FROM sessions 
-    WHERE date BETWEEN :start AND :end
-    """)
-    suspend fun countSessionsBetween(start: Long, end: Long): Int
+    @Insert
+    suspend fun insertSessionExercises(list: List<SessionExercise>)
 
+    @Query("SELECT * FROM session_exercises WHERE sessionId = :sessionId")
+    fun getSessionExercises(sessionId: Int): Flow<List<SessionExercise>>
 
+    @Update
+    suspend fun updateSessionExercise(sessionExercise: SessionExercise)
+
+    // Stats
     @Query("""
-        SELECT
-            s.id            AS id,
-            s.name          AS name,
-            s.category      AS category,
-            s.difficulty    AS difficulty,
-            s.date          AS date,
-            s.duration      AS duration,
-            COUNT(se.exerciseId)                                  AS totalExercises,
-            SUM(CASE WHEN se.isDone = 1 THEN 1 ELSE 0 END)       AS doneExercises
+        SELECT 
+            s.id,
+            s.name,
+            s.category,
+            s.difficulty,
+            s.date,
+            s.duration,
+            COUNT(se.exerciseId) as totalExercises,
+            COALESCE(SUM(CASE WHEN se.isDone = 1 THEN 1 ELSE 0 END), 0) as doneExercises
         FROM sessions s
         LEFT JOIN session_exercises se ON s.id = se.sessionId
         GROUP BY s.id
         ORDER BY s.date DESC
     """)
     suspend fun getSessionsWithStats(): List<SessionWithStats>
+
+    // Utils
+    @Query("""
+        SELECT COUNT(*) 
+        FROM sessions 
+        WHERE date BETWEEN :start AND :end
+    """)
+    suspend fun countSessionsBetween(start: Long, end: Long): Int
 
     @Query("DELETE FROM sessions")
     suspend fun clearSessions()

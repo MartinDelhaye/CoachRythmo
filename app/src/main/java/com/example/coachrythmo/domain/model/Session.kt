@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "sessions")
 data class Session(
-    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int? = null,
     val name: String,
     val category: String,
     val difficulty: Difficulty,

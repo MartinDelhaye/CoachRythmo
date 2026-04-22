@@ -74,7 +74,6 @@ class SessionViewModel(
     fun finishSession() {
         val routine = _routine.value ?: return
         timerJob?.cancel()
-
         viewModelScope.launch {
             val session = Session(
                 name = routine.name,
@@ -84,7 +83,6 @@ class SessionViewModel(
                 duration = _elapsedSeconds.value
             )
             val sessionId = sessionDao.insertSession(session).toInt()
-
             _exercises.value.forEach { exercise ->
                 sessionDao.insertSessionExercise(
                     SessionExercise(
@@ -94,7 +92,6 @@ class SessionViewModel(
                     )
                 )
             }
-
             _sessionSaved.value = true
         }
     }

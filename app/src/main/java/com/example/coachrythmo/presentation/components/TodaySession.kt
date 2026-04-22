@@ -12,6 +12,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -22,38 +24,43 @@ import com.example.coachrythmo.ui.theme.CRPrimaryRed
 @Composable
 fun TodaySession(
     navController: NavController,
-    routine: RoutineVM
+    routine: RoutineVM,
+    viewModel: TodaySessionViewModel
 ) {
-    Column{
+    val exercises by viewModel.exercises
+
+    LaunchedEffect(routine.id) {
+        routine.id?.let { viewModel.loadExercises(it) }
+    }
+
+    Column {
         Text(
             text = "Séance du jour",
             style = MaterialTheme.typography.titleMedium
         )
-
         Spacer(modifier = Modifier.height(8.dp))
 
         RoutineCard(
             routine = routine,
             onClick = {
-                routine.id?.let { navController.navigate(Screen.RoutineDetailScreen.createRoute(it)) }
+                routine.id?.let {
+                    navController.navigate(Screen.RoutineDetail.createRoute(it))
+                }
             }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = "Détail de la séance"
-        )
+        Text(text = "Détail de la séance")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // fake data pour l’instant
-        Text("Glutes - 4 x 15")
-        Text("Squads - 3 x 12")
-        Text("Glutes - 4 x 15")
-        Text("Squads - 3 x 12")
+        exercises.forEach { exercise ->
+            ExerciseItem(exercise)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
@@ -61,12 +68,10 @@ fun TodaySession(
             Button(
                 onClick = {
                     navController.navigate(
-                        Screen.SessionScreen.createRoute(routine.id!!)
+                        Screen.SessionScreen.createRoute(routine.id)
                     )
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CRPrimaryRed
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = CRPrimaryRed),
                 shape = RoundedCornerShape(50)
             ) {
                 Text("Commencer")
@@ -74,3 +79,6 @@ fun TodaySession(
         }
     }
 }
+```
+
+D'autres conflits ? 🙂

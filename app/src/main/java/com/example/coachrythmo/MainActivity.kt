@@ -13,10 +13,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.room.Room
 import com.example.coachrythmo.data.source.AppDatabase
 import com.example.coachrythmo.data.seed.SeedManager
@@ -28,16 +30,16 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
-import com.example.coachrythmo.presentation.list.RoutineDetailScreen
+import com.example.coachrythmo.presentation.list.RoutineDetail
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.presentation.compte.CompteScreen
 import com.example.coachrythmo.presentation.compte.CompteViewModel
+import com.example.coachrythmo.presentation.suivi.SuiviViewModel
+import com.example.coachrythmo.presentation.suivi.SuiviScreen
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.example.coachrythmo.presentation.suivi.SuiviViewModel
-import com.example.coachrythmo.presentation.suivi.SuiviScreen
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
             .build()
     }
 
-    private val dev = true;
+    private val dev = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,20 +78,14 @@ class MainActivity : ComponentActivity() {
                     ListRoutinesViewsModel(db.routineDao())
                 }
                 val homeViewModel = viewModel<HomeViewModel> {
-                    HomeViewModel(
-                        db.routineDao(),
-                        db.sessionDao()
-                    )
+                    HomeViewModel(db.routineDao(), db.sessionDao())
                 }
-
                 val todaySessionViewModel = viewModel<TodaySessionViewModel> {
                     TodaySessionViewModel(db.routineExerciseDao())
                 }
                 val suiviViewModel = viewModel<SuiviViewModel> {
                     SuiviViewModel(db.sessionDao())
                 }
-
-
                 val compteViewModel = viewModel<CompteViewModel> {
                     CompteViewModel()
                 }
@@ -112,7 +108,11 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable(Screen.HomeScreen.route) {
-                            HomeScreen(navController, homeViewModel)
+                            HomeScreen(
+                                navController,
+                                homeViewModel,
+                                todaySessionViewModel
+                            )
                         }
 
                         composable(Screen.RoutinesListScreen.route) {
@@ -124,25 +124,21 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            route = Screen.RoutineDetailScreen.route,
-                            arguments = listOf(androidx.navigation.navArgument("routineId") {
-                                type = androidx.navigation.NavType.IntType
+                            route = Screen.RoutineDetail.route,
+                            arguments = listOf(navArgument("routineId") {
+                                type = NavType.IntType
                             })
                         ) { backStackEntry ->
                             val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
-                            RoutineDetailScreen(navController, listViewModel, routineId)
+                            RoutineDetail(navController, listViewModel, routineId)
                         }
 
                         composable(Screen.SuiviScreen.route) {
                             SuiviScreen(navController, suiviViewModel)
                         }
 
-
                         composable(Screen.CompteScreen.route) {
-                            CompteScreen(
-                                navController,
-                                compteViewModel
-                            )
+                            CompteScreen(navController, compteViewModel)
                         }
 
                         composable(Screen.SessionScreen.route) { backStackEntry ->
@@ -152,10 +148,10 @@ class MainActivity : ComponentActivity() {
 
                             val sessionViewModel = viewModel<SessionViewModel> {
                                 SessionViewModel(
-                                    routineDao         = db.routineDao(),
+                                    routineDao = db.routineDao(),
                                     routineExerciseDao = db.routineExerciseDao(),
-                                    sessionDao         = db.sessionDao(),
-                                    routineId          = routineId
+                                    sessionDao = db.sessionDao(),
+                                    routineId = routineId
                                 )
                             }
                             SessionScreen(sessionViewModel, navController)

@@ -16,7 +16,6 @@ import java.util.Locale
 
 @Composable
 fun UpcomingSessions(sessions: List<UpcomingSession>, navController: NavController) {
-
     val formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM", Locale.FRENCH)
 
     Column {
@@ -24,7 +23,6 @@ fun UpcomingSessions(sessions: List<UpcomingSession>, navController: NavControll
             text = "Séances des prochains jours",
             style = MaterialTheme.typography.titleMedium
         )
-
         Spacer(modifier = Modifier.height(8.dp))
 
         if (sessions.isEmpty()) {
@@ -38,18 +36,16 @@ fun UpcomingSessions(sessions: List<UpcomingSession>, navController: NavControll
                 Column {
                     val formattedDate = session.date.format(formatter)
                         .replaceFirstChar { it.uppercase() }
-
                     Text(text = formattedDate)
-
                     Spacer(modifier = Modifier.height(4.dp))
-
                     RoutineCard(
                         routine = session.routine,
                         onClick = {
-                            session.routine.id?.let { navController.navigate(Screen.RoutineDetailScreen.createRoute(it)) }
+                            session.routine.id?.let {
+                                navController.navigate(Screen.RoutineDetail.createRoute(it))
+                            }
                         }
                     )
-
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }

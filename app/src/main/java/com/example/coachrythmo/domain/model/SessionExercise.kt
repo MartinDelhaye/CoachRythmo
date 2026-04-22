@@ -1,7 +1,6 @@
 package com.example.coachrythmo.domain.model
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "session_exercises",
