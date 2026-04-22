@@ -79,3 +79,6 @@ fun TodaySession(
         }
     }
 }
+```
+
+D'autres conflits ? 🙂

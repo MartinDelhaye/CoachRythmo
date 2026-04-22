@@ -1,6 +1,3 @@
-Voici le fichier corrigé — je garde les deux méthodes `getAll` et `getAllNow` pour éviter les erreurs :
-
-```kotlin
 package com.example.coachrythmo.data.source
 
 import androidx.room.*
