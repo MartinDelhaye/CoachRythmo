@@ -19,7 +19,7 @@ import com.example.coachrythmo.ui.theme.CRPrimaryRed
 import com.example.coachrythmo.ui.theme.CRWhite
 
 @Composable
-fun RoutineDetailScreen(
+fun RoutineDetail(
     navController: NavController,
     viewModel: ListRoutinesViewsModel,
     routineId: Int
