@@ -3,7 +3,6 @@ package com.example.coachrythmo.data.seed
 import com.example.coachrythmo.domain.model.Exercise
 
 object ExerciseSeed {
-
     fun getExercises(): List<Exercise> {
         return listOf(
             Exercise(name = "Développé couché", category = "Pectoraux"),
@@ -15,5 +14,4 @@ object ExerciseSeed {
             Exercise(name = "Course à pied", category = "Cardio")
         )
     }
-
 }

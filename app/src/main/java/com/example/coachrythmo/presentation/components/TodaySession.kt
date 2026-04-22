@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.coachrythmo.domain.model.Routine
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
@@ -35,25 +34,27 @@ fun TodaySession(
     }
 
     Column {
-
         Text(
             text = "Séance du jour",
             style = MaterialTheme.typography.titleMedium
         )
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        RoutineCard(routine = routine)
+        RoutineCard(
+            routine = routine,
+            onClick = {
+                routine.id?.let {
+                    navController.navigate(Screen.RoutineDetail.createRoute(it))
+                }
+            }
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = "Détail de la séance"
-        )
+        Text(text = "Détail de la séance")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ✅ VRAIS EXOS
         exercises.forEach { exercise ->
             ExerciseItem(exercise)
         }
@@ -67,12 +68,10 @@ fun TodaySession(
             Button(
                 onClick = {
                     navController.navigate(
-                        Screen.SessionScreen.createRoute(routine.id!!)
+                        Screen.SessionScreen.createRoute(routine.id)
                     )
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = CRPrimaryRed
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = CRPrimaryRed),
                 shape = RoundedCornerShape(50)
             ) {
                 Text("Commencer")
@@ -80,3 +79,6 @@ fun TodaySession(
         }
     }
 }
+```
+
+D'autres conflits ? 🙂
