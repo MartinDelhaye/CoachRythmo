@@ -23,7 +23,6 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     todaySessionViewModel: TodaySessionViewModel
 ) {
-
     val todayRoutine by viewModel.todayRoutine
     val upcomingSessions by viewModel.upcomingSessions
     val sessionDone by viewModel.sessionDoneToday
@@ -45,9 +44,8 @@ fun HomeScreen(
             WeekCalendar()
 
             if (todayRoutine != null) {
-
                 if (sessionDone) {
-                    Text("Séance déjà effectuée aujourd’hui ✅")
+                    Text("Séance déjà effectuée aujourd'hui ✅")
                 } else {
                     TodaySession(
                         navController = navController,
@@ -55,7 +53,6 @@ fun HomeScreen(
                         viewModel = todaySessionViewModel
                     )
                 }
-
             } else {
                 Text(
                     text = "Aucune séance prévue aujourd'hui 🎉",
@@ -63,7 +60,7 @@ fun HomeScreen(
                 )
             }
 
-            UpcomingSessions(upcomingSessions)
+            UpcomingSessions(upcomingSessions, navController)
         }
     }
 }

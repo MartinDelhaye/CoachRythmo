@@ -29,19 +29,16 @@ fun SessionScreen(
     viewModel: SessionViewModel,
     navController: NavController
 ) {
-
     val routine by viewModel.routine
     val exercises by viewModel.exercises
     val doneIds by viewModel.doneExerciseIds
     val elapsed by viewModel.elapsedSeconds
     val sessionSaved by viewModel.sessionSaved
 
-    // fermeture automatique
     LaunchedEffect(sessionSaved) {
         if (sessionSaved) navController.popBackStack()
     }
 
-    // protection null
     val safeRoutine = routine ?: run {
         Box(
             Modifier.fillMaxSize(),
@@ -72,47 +69,32 @@ fun SessionScreen(
             }
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
-            // bouton retour
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.Close, contentDescription = "Annuler")
             }
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
                 item {
                     Spacer(Modifier.height(16.dp))
-
                     Text(
                         text = safeRoutine.name,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
-
                     Spacer(Modifier.height(4.dp))
-
-                    Text(
-                        text = safeRoutine.category,
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
-
+                    Text(text = safeRoutine.category, color = Color.Gray, fontSize = 14.sp)
                     Spacer(Modifier.height(8.dp))
-
                     DifficultyBadge(safeRoutine.difficulty)
                 }
-
                 item {
                     Box(
                         modifier = Modifier
@@ -123,23 +105,16 @@ fun SessionScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
                             Text(
                                 text = viewModel.formatTime(elapsed),
                                 fontSize = 52.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = CRPrimaryRed
                             )
-
-                            Text(
-                                text = "en cours",
-                                fontSize = 13.sp,
-                                color = Color.Gray
-                            )
+                            Text(text = "en cours", fontSize = 13.sp, color = Color.Gray)
                         }
                     }
                 }
-
                 item {
                     Text(
                         text = "Exercices",
@@ -147,7 +122,6 @@ fun SessionScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
-
                 if (exercises.isEmpty()) {
                     item {
                         Text(
@@ -157,12 +131,9 @@ fun SessionScreen(
                         )
                     }
                 }
-
                 items(exercises) { exercise ->
-
                     val id = exercise.id
                     val isDone = id != null && id in doneIds
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -173,14 +144,11 @@ fun SessionScreen(
                                 color = if (isDone) Color(0xFF4CAF50) else Color(0xFFE0E0E0),
                                 shape = RoundedCornerShape(14.dp)
                             )
-                            .clickable {
-                                id?.let { viewModel.toggleExercise(it) }
-                            }
+                            .clickable { id?.let { viewModel.toggleExercise(it) } }
                             .padding(horizontal = 16.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-
                         Column {
                             Text(
                                 text = exercise.name,
@@ -188,8 +156,12 @@ fun SessionScreen(
                                 fontSize = 15.sp,
                                 color = if (isDone) Color(0xFF2E7D32) else Color.Black
                             )
+                            Text(
+                                text = exercise.category,
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
                         }
-
                         Box(
                             modifier = Modifier
                                 .size(28.dp)
@@ -215,7 +187,6 @@ fun SessionScreen(
                         }
                     }
                 }
-
                 item { Spacer(Modifier.height(8.dp)) }
             }
         }

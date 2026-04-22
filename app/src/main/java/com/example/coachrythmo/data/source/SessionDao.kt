@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SessionDao {
 
-    // 🔹 Session
+    // Session
     @Insert
     suspend fun insertSession(session: Session): Long
 
     @Query("SELECT * FROM sessions ORDER BY date DESC")
     fun getSessions(): Flow<List<Session>>
 
-    // 🔹 SessionExercise
+    // SessionExercise
     @Insert
     suspend fun insertSessionExercise(sessionExercise: SessionExercise)
 
@@ -29,7 +29,7 @@ interface SessionDao {
     @Update
     suspend fun updateSessionExercise(sessionExercise: SessionExercise)
 
-    // 🔹 Stats
+    // Stats
     @Query("""
         SELECT 
             s.id,
@@ -41,14 +41,13 @@ interface SessionDao {
             COUNT(se.exerciseId) as totalExercises,
             COALESCE(SUM(CASE WHEN se.isDone = 1 THEN 1 ELSE 0 END), 0) as doneExercises
         FROM sessions s
-        LEFT JOIN session_exercises se 
-            ON s.id = se.sessionId
+        LEFT JOIN session_exercises se ON s.id = se.sessionId
         GROUP BY s.id
         ORDER BY s.date DESC
     """)
     suspend fun getSessionsWithStats(): List<SessionWithStats>
 
-    // 🔹 Utils
+    // Utils
     @Query("""
         SELECT COUNT(*) 
         FROM sessions 
@@ -56,7 +55,6 @@ interface SessionDao {
     """)
     suspend fun countSessionsBetween(start: Long, end: Long): Int
 
-    // 🔹 Seed / Debug
     @Query("DELETE FROM sessions")
     suspend fun clearSessions()
 
