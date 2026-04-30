@@ -1,14 +1,13 @@
 package com.example.coachrythmo
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,11 +19,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.room.Room
-import com.example.coachrythmo.data.source.AppDatabase
 import com.example.coachrythmo.data.seed.SeedManager
+import com.example.coachrythmo.data.source.AppDatabase
+import com.example.coachrythmo.data.worker.NotificationScheduler
 import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.components.CustomMenu
 import com.example.coachrythmo.presentation.components.TodaySessionViewModel
+import com.example.coachrythmo.presentation.compte.CompteScreen
+import com.example.coachrythmo.presentation.compte.CompteViewModel
 import com.example.coachrythmo.presentation.home.HomeScreen
 import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
@@ -33,13 +35,12 @@ import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
 import com.example.coachrythmo.presentation.list.RoutineDetail
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
-import com.example.coachrythmo.presentation.compte.CompteScreen
-import com.example.coachrythmo.presentation.compte.CompteViewModel
-import com.example.coachrythmo.presentation.suivi.SuiviViewModel
 import com.example.coachrythmo.presentation.suivi.SuiviScreen
+import com.example.coachrythmo.presentation.suivi.SuiviViewModel
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
     private val db by lazy {
@@ -56,6 +57,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Demander permission notifications (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+
         enableEdgeToEdge()
         setContent {
             LaunchedEffect(Unit) {
@@ -66,6 +76,27 @@ class MainActivity : ComponentActivity() {
                             db.exerciseDao(),
                             db.routineExerciseDao(),
                             db.sessionDao()
+                        )
+                    }
+
+                    // Planifier les notifications pour chaque routine
+                    val routines = db.routineDao().getAllNow()
+                    routines.forEach { routine ->
+                        val dayIndex = when (routine.day.lowercase()) {
+                            "lundi"    -> Calendar.MONDAY
+                            "mardi"    -> Calendar.TUESDAY
+                            "mercredi" -> Calendar.WEDNESDAY
+                            "jeudi"    -> Calendar.THURSDAY
+                            "vendredi" -> Calendar.FRIDAY
+                            "samedi"   -> Calendar.SATURDAY
+                            "dimanche" -> Calendar.SUNDAY
+                            else       -> Calendar.MONDAY
+                        }
+                        NotificationScheduler.scheduleRoutineNotification(
+                            context = applicationContext,
+                            routineName = routine.name,
+                            routineTime = routine.startTime,
+                            dayOfWeek = dayIndex
                         )
                     }
                 }
