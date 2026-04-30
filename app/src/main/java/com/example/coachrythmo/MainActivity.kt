@@ -30,7 +30,7 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
-import com.example.coachrythmo.presentation.list.RoutineDetail
+// import com.example.coachrythmo.presentation.list.RoutineDetail
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.presentation.compte.CompteScreen
@@ -61,12 +61,16 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 withContext(Dispatchers.IO) {
                     if (dev) {
-                        SeedManager.seedDatabase(
-                            db.routineDao(),
-                            db.exerciseDao(),
-                            db.routineExerciseDao(),
-                            db.sessionDao()
-                        )
+                        try {
+                            SeedManager.seedDatabase(
+                                db.routineDao(),
+                                db.exerciseDao(),
+                                db.routineExerciseDao(),
+                                db.sessionDao()
+                            )
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
@@ -130,7 +134,7 @@ class MainActivity : ComponentActivity() {
                             })
                         ) { backStackEntry ->
                             val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
-                            RoutineDetail(navController, listViewModel, routineId)
+                            // RoutineDetail(navController, listViewModel, routineId)
                         }
 
                         composable(Screen.SuiviScreen.route) {

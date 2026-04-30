@@ -17,7 +17,7 @@ import com.example.coachrythmo.domain.model.SessionExercise
         Session::class,
         SessionExercise::class
     ],
-    version = 4
+    version = 5
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
