@@ -12,4 +12,5 @@ sealed class Screen(val route: String) {
     data object SessionScreen : Screen(route = "session_screen/{routineId}") {
         fun createRoute(routineId: Int?) = "session_screen/$routineId"
     }
+    data object MapPickerScreen : Screen(route = "map_picker")
 }

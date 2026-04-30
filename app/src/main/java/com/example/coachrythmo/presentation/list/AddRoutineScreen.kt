@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.coachrythmo.domain.model.Difficulty
+import com.example.coachrythmo.navigation.Screen
 import com.example.coachrythmo.presentation.RoutineVM
 import com.example.coachrythmo.ui.theme.CRPrimaryRed
 
@@ -29,9 +30,20 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
     var startTime by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
     var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
+    var selectedLatitude by remember { mutableStateOf<Double?>(null) }
+    var selectedLongitude by remember { mutableStateOf<Double?>(null) }
 
     val days = listOf("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
     var dayExpanded by remember { mutableStateOf(false) }
+
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val returnedLat = savedStateHandle?.getStateFlow<Double?>("latitude", null)?.collectAsState()
+    val returnedLng = savedStateHandle?.getStateFlow<Double?>("longitude", null)?.collectAsState()
+
+    LaunchedEffect(returnedLat?.value, returnedLng?.value) {
+        returnedLat?.value?.let { selectedLatitude = it }
+        returnedLng?.value?.let { selectedLongitude = it }
+    }
 
     Scaffold(
         topBar = {
@@ -124,6 +136,19 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 shape = RoundedCornerShape(12.dp)
             )
 
+            OutlinedButton(
+                onClick = { navController.navigate(Screen.MapPickerScreen.route) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    if (selectedLatitude != null)
+                        "📍 Lieu défini (${String.format("%.4f", selectedLatitude)}, ${String.format("%.4f", selectedLongitude)})"
+                    else
+                        "📍 Choisir un lieu (optionnel)"
+                )
+            }
+
             Text("Difficulté *", fontSize = 16.sp, fontWeight = FontWeight.Medium)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -155,7 +180,10 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                                 day = selectedDay,
                                 startTime = startTime,
                                 difficulty = selectedDifficulty,
-                                durationMinutes = duration.toIntOrNull()
+                                durationMinutes = duration.toIntOrNull(),
+                                latitude = selectedLatitude,
+                                longitude = selectedLongitude
+
                             )
                         )
                         navController.popBackStack()

@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -36,6 +37,7 @@ import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.presentation.compte.CompteScreen
 import com.example.coachrythmo.presentation.compte.CompteViewModel
+import com.example.coachrythmo.presentation.map.MapPickerScreen
 import com.example.coachrythmo.presentation.suivi.SuiviViewModel
 import com.example.coachrythmo.presentation.suivi.SuiviScreen
 import com.example.coachrythmo.ui.theme.CoachRythmoTheme
@@ -191,6 +193,22 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             SessionScreen(sessionViewModel, navController)
+                        }
+                        composable(Screen.MapPickerScreen.route) {
+                            val parentEntry = remember(it) {
+                                navController.getBackStackEntry(Screen.AddRoutineScreen.route)
+                            }
+                            MapPickerScreen(
+                                navController = navController,
+                                onLocationPicked = { lat, lng ->
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("latitude", lat)
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("longitude", lng)
+                                }
+                            )
                         }
                     }
                 }
