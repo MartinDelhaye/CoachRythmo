@@ -11,7 +11,9 @@ data class RoutineVM(
     val day: String,
     val startTime: String,
     val difficulty: Difficulty,
-    val durationMinutes: Int? = null
+    val durationMinutes: Int? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 fun RoutineVM.toEntity(): Routine = Routine(
@@ -22,7 +24,9 @@ fun RoutineVM.toEntity(): Routine = Routine(
     day = day,
     startTime = startTime,
     difficulty = difficulty,
-    durationMinutes = durationMinutes
+    durationMinutes = durationMinutes,
+    latitude = latitude,
+    longitude = longitude
 )
 
 fun Routine.toVM(): RoutineVM = RoutineVM(
@@ -33,5 +37,7 @@ fun Routine.toVM(): RoutineVM = RoutineVM(
     day = day,
     startTime = startTime,
     difficulty = difficulty,
-    durationMinutes = durationMinutes
+    durationMinutes = durationMinutes,
+    latitude = latitude,
+    longitude = longitude
 )

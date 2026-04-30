@@ -13,5 +13,7 @@ data class Routine(
     val day: String,
     val startTime: String,
     val difficulty: Difficulty,
-    val durationMinutes: Int?
+    val durationMinutes: Int?,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )

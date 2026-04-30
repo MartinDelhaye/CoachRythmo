@@ -23,7 +23,9 @@ object RoutineSeed {
                 day = "Jeudi",
                 startTime = "18:30",
                 difficulty = Difficulty.MEDIUM,
-                durationMinutes = 30
+                durationMinutes = 30,
+                latitude = 48.4215,
+                longitude = -71.0532
             ),
             Routine(
                 name = "Leg Day",
