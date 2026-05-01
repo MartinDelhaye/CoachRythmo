@@ -60,4 +60,8 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.play.services.location)
+    implementation(libs.osmdroid)
 }

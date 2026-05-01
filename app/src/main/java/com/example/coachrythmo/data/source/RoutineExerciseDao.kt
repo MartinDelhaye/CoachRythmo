@@ -2,6 +2,7 @@ package com.example.coachrythmo.data.source
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.coachrythmo.domain.model.Exercise
 import com.example.coachrythmo.domain.model.RoutineExerciseCrossRef
@@ -22,4 +23,10 @@ interface RoutineExerciseDao {
 
     @Query("DELETE FROM routine_exercise")
     suspend fun clear()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(crossRef: RoutineExerciseCrossRef)
+
+    @Query("DELETE FROM routine_exercise WHERE routineId = :routineId AND exerciseId = :exerciseId")
+    suspend fun delete(routineId: Int, exerciseId: Int)
 }
