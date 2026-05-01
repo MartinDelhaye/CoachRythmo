@@ -91,7 +91,7 @@ fun ListRoutinesScreen(navController: NavController, viewModel: ListRoutinesView
                     routine = routine,
                     onClick = {
                         routine.id?.let { id ->
-                            // navController.navigate(Screen.RoutineDetailScreen.createRoute(id))
+                            navController.navigate(Screen.RoutineDetail.createRoute(id))
                         }
                     }
                 )

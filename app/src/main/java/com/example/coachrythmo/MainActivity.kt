@@ -32,7 +32,7 @@ import com.example.coachrythmo.presentation.home.HomeViewModel
 import com.example.coachrythmo.presentation.list.AddRoutineScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesScreen
 import com.example.coachrythmo.presentation.list.ListRoutinesViewsModel
-// import com.example.coachrythmo.presentation.list.RoutineDetail
+import com.example.coachrythmo.presentation.list.RoutineDetailScreen
 import com.example.coachrythmo.presentation.session.SessionScreen
 import com.example.coachrythmo.presentation.session.SessionViewModel
 import com.example.coachrythmo.presentation.compte.CompteScreen
@@ -113,7 +113,11 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val listViewModel = viewModel<ListRoutinesViewsModel> {
-                    ListRoutinesViewsModel(db.routineDao())
+                    ListRoutinesViewsModel(
+                        dao = db.routineDao(),
+                        exerciseDao = db.exerciseDao(),
+                        routineExerciseDao = db.routineExerciseDao()
+                    )
                 }
                 val homeViewModel = viewModel<HomeViewModel> {
                     HomeViewModel(db.routineDao(), db.sessionDao())
@@ -168,7 +172,7 @@ class MainActivity : ComponentActivity() {
                             })
                         ) { backStackEntry ->
                             val routineId = backStackEntry.arguments?.getInt("routineId") ?: return@composable
-                            // RoutineDetail(navController, listViewModel, routineId)
+                            RoutineDetailScreen(navController, listViewModel, routineId)
                         }
 
                         composable(Screen.SuiviScreen.route) {

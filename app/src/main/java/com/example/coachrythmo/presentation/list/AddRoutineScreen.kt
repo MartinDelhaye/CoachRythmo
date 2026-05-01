@@ -1,6 +1,9 @@
 package com.example.coachrythmo.presentation.list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -8,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -23,26 +27,21 @@ import com.example.coachrythmo.ui.theme.CRPrimaryRed
 @Composable
 fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsModel) {
 
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var selectedDay by remember { mutableStateOf("Lundi") }
-    var startTime by remember { mutableStateOf("") }
-    var duration by remember { mutableStateOf("") }
-    var selectedDifficulty by remember { mutableStateOf(Difficulty.EASY) }
-    var selectedLatitude by remember { mutableStateOf<Double?>(null) }
-    var selectedLongitude by remember { mutableStateOf<Double?>(null) }
-
     val days = listOf("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
     var dayExpanded by remember { mutableStateOf(false) }
+    var showExerciseDialog by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val allExercises = viewModel.allExercises.value
 
+    // Récupération des coordonnées retournées par MapPickerScreen
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
     val returnedLat = savedStateHandle?.getStateFlow<Double?>("latitude", null)?.collectAsState()
     val returnedLng = savedStateHandle?.getStateFlow<Double?>("longitude", null)?.collectAsState()
 
+    // On écrit directement dans le ViewModel — pas de copie locale
     LaunchedEffect(returnedLat?.value, returnedLng?.value) {
-        returnedLat?.value?.let { selectedLatitude = it }
-        returnedLng?.value?.let { selectedLongitude = it }
+        returnedLat?.value?.let { viewModel.formLatitude = it }
+        returnedLng?.value?.let { viewModel.formLongitude = it }
     }
 
     Scaffold(
@@ -68,16 +67,16 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = viewModel.formName,
+                onValueChange = { viewModel.formName = it },
                 label = { Text("Nom de la séance *") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
             OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = viewModel.formDescription,
+                onValueChange = { viewModel.formDescription = it },
                 label = { Text("Description (optionnel)") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -85,8 +84,8 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
             )
 
             OutlinedTextField(
-                value = category,
-                onValueChange = { category = it },
+                value = viewModel.formCategory,
+                onValueChange = { viewModel.formCategory = it },
                 label = { Text("Catégorie *") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -97,7 +96,7 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 onExpandedChange = { dayExpanded = it }
             ) {
                 OutlinedTextField(
-                    value = selectedDay,
+                    value = viewModel.formDay,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Jour *") },
@@ -114,23 +113,23 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                     days.forEach { day ->
                         DropdownMenuItem(
                             text = { Text(day) },
-                            onClick = { selectedDay = day; dayExpanded = false }
+                            onClick = { viewModel.formDay = day; dayExpanded = false }
                         )
                     }
                 }
             }
 
             OutlinedTextField(
-                value = startTime,
-                onValueChange = { startTime = it },
+                value = viewModel.formStartTime,
+                onValueChange = { viewModel.formStartTime = it },
                 label = { Text("Heure de début *") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
             OutlinedTextField(
-                value = duration,
-                onValueChange = { duration = it.filter { c -> c.isDigit() } },
+                value = viewModel.formDuration,
+                onValueChange = { viewModel.formDuration = it.filter { c -> c.isDigit() } },
                 label = { Text("Durée (minutes)") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -142,8 +141,8 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    if (selectedLatitude != null)
-                        "📍 Lieu défini (${String.format("%.4f", selectedLatitude)}, ${String.format("%.4f", selectedLongitude)})"
+                    if (viewModel.formLatitude != null)
+                        "📍 Lieu défini (${String.format("%.4f", viewModel.formLatitude)}, ${String.format("%.4f", viewModel.formLongitude)})"
                     else
                         "📍 Choisir un lieu (optionnel)"
                 )
@@ -153,10 +152,10 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Difficulty.entries.forEach { diff ->
-                    val isSelected = selectedDifficulty == diff
+                    val isSelected = viewModel.formDifficulty == diff
                     FilterChip(
                         selected = isSelected,
-                        onClick = { selectedDifficulty = diff },
+                        onClick = { viewModel.formDifficulty = diff },
                         label = { Text(diff.label) },
                         shape = RoundedCornerShape(20.dp),
                         colors = FilterChipDefaults.filterChipColors(
@@ -167,29 +166,104 @@ fun AddRoutineScreen(navController: NavController, viewModel: ListRoutinesViewsM
                 }
             }
 
+            OutlinedButton(
+                onClick = { showExerciseDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    if (viewModel.formExerciseIds.isEmpty()) "Ajouter des exercices (optionnel)"
+                    else "${viewModel.formExerciseIds.size} exercice(s) sélectionné(s)"
+                )
+            }
+
+            if (showExerciseDialog) {
+                val available = allExercises.filter { it.name.contains(searchQuery, ignoreCase = true) }
+                AlertDialog(
+                    onDismissRequest = { showExerciseDialog = false; searchQuery = "" },
+                    title = { Text("Choisir des exercices") },
+                    text = {
+                        Column {
+                            OutlinedTextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                label = { Text("Rechercher...") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                                items(available) { exercise ->
+                                    val isSelected = viewModel.formExerciseIds.contains(exercise.id)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                viewModel.formExerciseIds =
+                                                    if (isSelected) viewModel.formExerciseIds - exercise.id
+                                                    else viewModel.formExerciseIds + exercise.id
+                                            }
+                                            .padding(vertical = 8.dp, horizontal = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(checked = isSelected, onCheckedChange = null)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Column {
+                                            Text(exercise.name, fontWeight = FontWeight.Medium)
+                                            Text(exercise.category, fontSize = 12.sp, color = Color.Gray)
+                                        }
+                                    }
+                                    HorizontalDivider()
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showExerciseDialog = false; searchQuery = "" }) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showExerciseDialog = false; searchQuery = "" }) {
+                            Text("Annuler")
+                        }
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
-                    if (name.isNotBlank() && category.isNotBlank() && startTime.isNotBlank()) {
-                        viewModel.saveRoutine(
+                    android.util.Log.d(
+                        "ADD_ROUTINE",
+                        "name='${viewModel.formName}' category='${viewModel.formCategory}' startTime='${viewModel.formStartTime}'"
+                    )
+                    if (viewModel.formName.isNotBlank() &&
+                        viewModel.formCategory.isNotBlank() &&
+                        viewModel.formStartTime.isNotBlank()
+                    ) {
+                        viewModel.saveRoutineWithExercises(
                             RoutineVM(
-                                name = name,
-                                description = description,
-                                category = category,
-                                day = selectedDay,
-                                startTime = startTime,
-                                difficulty = selectedDifficulty,
-                                durationMinutes = duration.toIntOrNull(),
-                                latitude = selectedLatitude,
-                                longitude = selectedLongitude
-
-                            )
+                                name = viewModel.formName,
+                                description = viewModel.formDescription,
+                                category = viewModel.formCategory,
+                                day = viewModel.formDay,
+                                startTime = viewModel.formStartTime,
+                                difficulty = viewModel.formDifficulty,
+                                durationMinutes = viewModel.formDuration.toIntOrNull(),
+                                latitude = viewModel.formLatitude,
+                                longitude = viewModel.formLongitude
+                            ),
+                            viewModel.formExerciseIds
                         )
+                        viewModel.resetForm()   // ← nettoyage après sauvegarde
                         navController.popBackStack()
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = CRPrimaryRed)
             ) {
